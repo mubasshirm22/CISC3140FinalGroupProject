@@ -1,0 +1,168 @@
+.steamdb-detail-container {
+  padding-top: 100px;
+  background-color: #161920;
+  min-height: 100vh;
+  color: #f0f0f0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  padding-bottom: 50px;
+}
+
+.db-header {
+  background-color: #1b2838;
+  border-bottom: 1px solid #2a475e;
+  padding: 20px 0;
+  margin-bottom: 30px;
+}
+
+.db-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.db-app-icon {
+  width: 120px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #3c4149;
+}
+
+.db-title-area {
+  flex: 1;
+}
+
+.db-app-name {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.db-app-id {
+  color: #8f98a0;
+  font-size: 0.85rem;
+}
+
+.db-app-id span {
+  color: #66c0f4;
+}
+
+.db-price-badge {
+  background: #a4d007;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.price-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.price-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.db-main-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.table-section-title {
+  background: #212429;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-left: 4px solid #66c0f4;
+  margin-bottom: 2px;
+}
+
+.db-row {
+  display: flex;
+  background: #1b1e23;
+  border-bottom: 1px solid #282c32;
+  padding: 12px 15px;
+}
+
+.db-cell.label {
+  width: 200px;
+  color: #8f98a0;
+  font-size: 0.9rem;
+}
+
+.db-cell.value {
+  flex: 1;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.db-description-box {
+  background: #1b1e23;
+  padding: 20px;
+  line-height: 1.6;
+  color: #acb2b8;
+}
+
+.db-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.db-action-card {
+  background: #1b1e23;
+  padding: 20px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.db-btn-cart {
+  background: #2a475e;
+  color: #66c0f4;
+  border: 1px solid #3a5a78;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.db-btn-cart:hover {
+  background: #66c0f4;
+  color: #fff;
+}
+
+.db-btn-wishlist {
+  background: transparent;
+  color: #8f98a0;
+  border: 1px solid #3c4149;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.db-sidebar-img {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #2a475e;
+}
+
+@media (max-width: 850px) {
+  .db-main-grid {
+      grid-template-columns: 1fr;
+  }
+  .db-header-content {
+      flex-direction: column;
+      text-align: center;
+  }
+}

@@ -1,0 +1,126 @@
+* {
+  box-sizing: border-box;
+}
+
+.navbar-container {
+  height: 80px;
+  background-color: rgba(23, 26, 33, 0.98);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(102, 192, 244, 0.2);
+}
+
+.nav-content-wrapper {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand-logo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+
+.brand-logo span { color: #66c0f4; }
+
+.nav-center {
+  flex: 1;
+  max-width: 350px;
+  margin: 0 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 15px;
+  background-color: #316282;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  outline: none;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-shrink: 0;
+}
+
+.cart-link {
+  position: relative;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: #a4d007;
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.auth-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.nav-link {
+  color: #c6d4df;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.nav-link:hover { color: #fff; }
+
+.user-logged-in {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(102, 192, 244, 0.1);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(102, 192, 244, 0.2);
+}
+
+.welcome-text {
+  color: #66c0f4;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.logout-button {
+  background: transparent;
+  border: none;
+  color: #ff4b4b;
+  font-weight: bold;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
