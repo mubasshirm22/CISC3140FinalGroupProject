@@ -1,0 +1,85 @@
+.home-container {
+    background-color: #1b2838;
+    min-height: 100vh;
+    color: #c7d5e0;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .hero-section {
+    background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.2)), 
+                url("https://shared.akamai.steamstatic.com/store_apps/582010/library_600x900_2x.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 350px;
+    display: flex;
+    align-items: flex-end;
+    padding: 40px;
+    margin-bottom: 30px;
+  }
+  
+  .hero-title {
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 4px;
+    border-left: 4px solid #66c0f4;
+    font-size: 2.5rem;
+    margin: 0;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  
+  .main-content {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 30px;
+    padding: 0 20px;
+  }
+  
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+  }
+  
+  .sidebar h4 {
+    color: #66c0f4;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+  }
+  
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    font-size: 0.9rem;
+    line-height: 2.5;
+    color: #acb2b8;
+  }
+  
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    flex-grow: 1;
+  }
+  
+  .game-card {
+    background: linear-gradient(45deg, #16202d, #1b2838);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    text-decoration: none;
+  }
+  
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  }
+  
+  .discount-tag {
+    background-color: #4c6b22;
+    color: #beee11;
+    padding: 3px 8px;
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
