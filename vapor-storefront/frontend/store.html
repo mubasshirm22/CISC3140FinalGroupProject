@@ -46,39 +46,76 @@
       products.forEach(p => {
         const div = document.createElement("div");
         div.className = "product";
+
+        const isOwned = owned.includes(p.product_id);
+
         div.innerHTML = `
           <h2>${p.name}</h2>
           <p>${p.description}</p>
           <strong>$${p.price}</strong><br><br>
-          <button onclick="buy('${p.product_id}')">Buy</button>
+
+          ${
+            isOwned
+              ? `<span class="owned-badge">Already Owned</span>`
+              : `<button onclick="addToCart('${p.product_id}')">Add to Cart</button>`
+          }
         `;
-        container.appendChild(div);
-      });
+        
+      container.appendChild(div);
+});
+
     }
 
     // 2. Checkout
-    async function buy(productId) {
+    async function addToCart(productId) {
       const token = localStorage.getItem("jwt");
 
       if (!token) {
         alert("You must log in first.");
+        window.location.href = "login.html";
         return;
       }
 
-      const res = await fetch(`${API}/checkout`, {
+      const res = await fetch(`${API}/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer " + token
         },
-        body: JSON.stringify({ items: [productId] })
+        body: JSON.stringify({ product_id: productId })
       });
 
       const data = await res.json();
-      alert(JSON.stringify(data, null, 2));
+
+      if (!res.ok) {
+        alert(data.error || "Failed to add to cart");
+        return;
+      }
+
+      alert("Added to cart!");
+}
+
+    let owned = [];
+
+    async function loadOwned() {
+      const token = localStorage.getItem("jwt");
+      if (!token) return;
+
+      const res = await fetch(`${API}/library`, {
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      const data = await res.json();
+      owned = data.map(item => item.product_id);
     }
 
-    loadProducts();
+    async function init() {
+      await loadOwned();
+      await loadProducts();
+    }
+
+    init();
+
   </script>
 
 </body>

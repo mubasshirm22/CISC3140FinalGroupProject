@@ -35,6 +35,17 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL
 });
 
+// Display Name
+app.get("/me", authMiddleware, async (req, res) => {
+  const result = await db.query(
+    `SELECT customer_id, email, display_name
+     FROM customers
+     WHERE customer_id = $1`,
+    [req.customer_id]
+  );
+
+  res.json(result.rows[0]);
+});
 // REGISTER
 app.post("/register", async (req, res) => {
     const { email, displayName, password } = req.body;
@@ -93,6 +104,43 @@ app.get("/products", async (req, res) => {
     res.status(500).json({ error: "Failed to load products" });
   }
 });
+
+// CART
+app.post("/cart/add", authMiddleware, async (req, res) => {
+  const { product_id } = req.body;
+
+  await db.query(`
+    INSERT INTO cart_items (customer_id, product_id, quantity)
+    VALUES ($1, $2, 1)
+    ON CONFLICT (customer_id, product_id)
+    DO UPDATE SET quantity = cart_items.quantity + 1
+  `, [req.customer_id, product_id]);
+
+  res.json({ message: "Added to cart" });
+});
+
+app.get("/cart", authMiddleware, async (req, res) => {
+  const result = await db.query(`
+    SELECT ci.quantity, p.*
+    FROM cart_items ci
+    JOIN products p ON p.product_id = ci.product_id
+    WHERE ci.customer_id = $1
+  `, [req.customer_id]);
+
+  res.json(result.rows);
+});
+
+app.post("/cart/remove", authMiddleware, async (req, res) => {
+  const { product_id } = req.body;
+
+  await db.query(`
+    DELETE FROM cart_items
+    WHERE customer_id = $1 AND product_id = $2
+  `, [req.customer_id, product_id]);
+
+  res.json({ message: "Removed" });
+});
+
 // LIBRARY
 app.get("/library", authMiddleware, async (req, res) => {
   try {
@@ -185,6 +233,11 @@ app.post("/checkout", auth, async (req, res) => {
                 [req.customer_id, product_id]
             );
         }
+
+            await db.query(`
+                DELETE FROM cart_items
+                WHERE customer_id = $1
+        `, [req.customer_id]);
 
         res.json({ message: "Checkout complete", order_id });
 

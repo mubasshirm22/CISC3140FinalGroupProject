@@ -9,6 +9,16 @@ h1 {
   text-align: center;
   margin-top: 20px;
 }
+/* OWNED PRODUCTS */
+.owned-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #46704866;
+  color: white;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
 
 /* LIBRARY PAGE */
 #library {

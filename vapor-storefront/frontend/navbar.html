@@ -1,6 +1,7 @@
 <div id="navbar">
   <a href="store.html">Store</a>
   <a href="library.html">Library</a>
+  <a href="cart.html">Cart</a>
   <span id="authLink"></span>
 </div>
 
@@ -14,8 +15,20 @@
   const authLink = document.getElementById("authLink");
 
   if (token) {
-    authLink.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
-  } else {
-    authLink.innerHTML = `<a href="login.html">Login</a>`;
+  fetch("http://localhost:8080/me", {
+    headers: { "Authorization": "Bearer " + token }
+  })
+  .then(res => res.json())
+  .then(user => {
+    authLink.innerHTML = `
+      <span>Welcome, ${user.display_name}</span> |
+      <a href="#" onclick="logout()">Logout</a>
+    `;
+  });
+} else {
+    authLink.innerHTML = `
+      <a href="login.html">Login</a> |
+      <a href="register.html">Register</a>
+    `;
   }
 </script>
