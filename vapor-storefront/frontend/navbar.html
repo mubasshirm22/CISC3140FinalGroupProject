@@ -1,0 +1,21 @@
+<div id="navbar">
+  <a href="store.html">Store</a>
+  <a href="library.html">Library</a>
+  <span id="authLink"></span>
+</div>
+
+<script>
+  function logout() {
+    localStorage.removeItem("jwt");
+    window.location.href = "login.html";
+  }
+
+  const token = localStorage.getItem("jwt");
+  const authLink = document.getElementById("authLink");
+
+  if (token) {
+    authLink.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
+  } else {
+    authLink.innerHTML = `<a href="login.html">Login</a>`;
+  }
+</script>
