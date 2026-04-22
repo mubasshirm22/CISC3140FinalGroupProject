@@ -1,16 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import '../style/HomePage.css';
 
 function HomePage() {
   const [games, setGames] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const location = useLocation();
 
   useEffect(() => {
-    fetch('http://localhost:8080/products')
-      .then(res => res.json())
-      .then(data => setGames(data))
-      .catch(err => console.error("Fetch error:", err));
-  }, []);
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q');
+
+    if (q) {
+      setSearchTerm(q);
+      fetch(`http://localhost:8080/search?q=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => setGames(data))
+        .catch(err => console.error("Search error:", err));
+    } else {
+      setSearchTerm('');
+      fetch('http://localhost:8080/products')
+        .then(res => res.json())
+        .then(data => setGames(data))
+        .catch(err => console.error("Fetch error:", err));
+    }
+  }, [location.search]);
 
   return (
     <div className="home-container">
@@ -31,7 +45,9 @@ function HomePage() {
 
         <section className="game-grid">
           {games.length === 0 ? (
-            <p style={{ color: '#66c0f4' }}>Syncing with Database...</p>
+            searchTerm
+              ? <p style={{ color: '#66c0f4' }}>No products found for "{searchTerm}".</p>
+              : <p style={{ color: '#66c0f4' }}>Syncing with Database...</p>
           ) : (
             games.map(game => (
               <Link to={`/game/${game.product_id}`} key={game.product_id} className="game-card">

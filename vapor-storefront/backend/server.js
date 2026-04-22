@@ -105,6 +105,21 @@ app.get("/products", async (req, res) => {
   }
 });
 
+// SEARCH
+app.get("/search", async (req, res) => {
+  const { q } = req.query;
+  try {
+    const result = await db.query(
+      "SELECT * FROM products WHERE name ILIKE $1 ORDER BY name",
+      [`%${q}%`]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Search failed" });
+  }
+});
+
 // CART
 app.post("/cart/add", authMiddleware, async (req, res) => {
   const { product_id } = req.body;
