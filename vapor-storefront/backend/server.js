@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
 const cors = require("cors");
 
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -61,6 +62,7 @@ app.post("/register", async (req, res) => {
 
         res.json({ message: "Account created" });
     } catch (err) {
+        console.error(err);
         res.status(400).json({ error: "Email already exists" });
     }
 });
@@ -120,7 +122,7 @@ app.get("/search", async (req, res) => {
   }
 });
 
-// CART
+// CART.   Arslan Part working
 app.post("/cart/add", authMiddleware, async (req, res) => {
   const { product_id } = req.body;
 
