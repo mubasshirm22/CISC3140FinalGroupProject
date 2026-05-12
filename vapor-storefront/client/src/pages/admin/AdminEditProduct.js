@@ -15,6 +15,23 @@ function AdminEditProduct() {
     image_url: ""
   });
 
+  const openUploadWidget = () => {
+  window.cloudinary.openUploadWidget(
+    {
+      cloudName: "dswxezumx",
+      uploadPreset: "ml_default",
+      sources: ["local", "url", "camera"],
+      multiple: false,
+      cropping: false
+    },
+    (error, result) => {
+      if (!error && result && result.event === "success") {
+        setForm({ ...form, image_url: result.info.secure_url });
+      }
+    }
+  );
+};
+
   const [loading, setLoading] = useState(!isNew);
 
   useEffect(() => {
@@ -100,6 +117,14 @@ function AdminEditProduct() {
           value={form.image_url}
           onChange={handleChange}
         />
+
+        <button
+          type="button"
+          className="admin-upload-btn"
+          onClick={openUploadWidget}
+        >
+          Upload Image
+        </button>
 
         <img
           src={form.image_url}

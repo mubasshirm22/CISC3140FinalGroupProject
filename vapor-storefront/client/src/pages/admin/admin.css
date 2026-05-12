@@ -188,3 +188,20 @@
   border-radius: 6px;
   cursor: pointer;
 }
+
+/* Cloudinary upload button */
+
+.admin-upload-btn {
+  background: #2563eb;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.admin-upload-btn:hover {
+  background: #3b82f6;
+}
+
