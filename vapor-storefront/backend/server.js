@@ -2,70 +2,83 @@ require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { Pool } = require("pg");
+const db = require("./db/db.js");
+const productRoutes = require("./routes/productRoutes.js");
 const cors = require("cors");
+const authMiddleware = require("./middleware/authMiddleware.js");
+const authRoutes = require("./routes/authRoutes");
+
+// moved the following code into db.js.
+// const { Pool } = require("pg");
+// Connect to PostgreSQL
+// const db = new Pool({
+//     connectionString: process.env.DATABASE_URL
+// });
 
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ error: "Missing Authorization header" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.customer_id = decoded.customer_id;  // IMPORTANT
-
-    next();
-  } catch (err) {
-    console.error("JWT error:", err);
-    res.status(401).json({ error: "Invalid token" });
-  }
-}
+app.use("/", productRoutes);
+app.use("/", authRoutes);
 
 
-// Connect to PostgreSQL
-const db = new Pool({
-    connectionString: process.env.DATABASE_URL
-});
+// Middlewa
+// function authMiddleware(req, res, next) {
+//   const authHeader = req.headers.authorization;
+//   if (!authHeader) {
+//     return res.status(401).json({ error: "Missing Authorization header" });
+//   }
+
+//   const token = authHeader.split(" ")[1];
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+//     req.customer_id = decoded.customer_id;  // IMPORTANT
+
+//     next();
+//   } catch (err) {
+//     console.error("JWT error:", err);
+//     res.status(401).json({ error: "Invalid token" });
+//   }
+// }
+
+
+
 
 // Display Name
-app.get("/me", authMiddleware, async (req, res) => {
-  const result = await db.query(
-    `SELECT customer_id, email, display_name
-     FROM customers
-     WHERE customer_id = $1`,
-    [req.customer_id]
-  );
+// app.get("/me", authMiddleware, async (req, res) => {
+//   const result = await db.query(
+//     `SELECT customer_id, email, display_name
+//      FROM customers
+//      WHERE customer_id = $1`,
+//     [req.customer_id]
+//   );
 
-  res.json(result.rows[0]);
-});
+//   res.json(result.rows[0]);
+// });
+
+
 // REGISTER
-app.post("/register", async (req, res) => {
-    const { email, displayName, password } = req.body;
+// app.post("/register", async (req, res) => {
+//     const { email, displayName, password } = req.body;
 
-    const hashed = await bcrypt.hash(password, 10);
+//     const hashed = await bcrypt.hash(password, 10);
 
-    try {
-        await db.query(
-            `INSERT INTO customers (email, display_name, password_hash)
-             VALUES ($1, $2, $3)`,
-            [email, displayName, hashed]
-        );
+//     try {
+//         await db.query(
+//             `INSERT INTO customers (email, display_name, password_hash)
+//              VALUES ($1, $2, $3)`,
+//             [email, displayName, hashed]
+//         );
 
-        res.json({ message: "Account created" });
-    } catch (err) {
-        console.error(err);
-        res.status(400).json({ error: "Email already exists" });
-    }
-});
+//         res.json({ message: "Account created" });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(400).json({ error: "Email already exists" });
+//     }
+// });
 
 // LOGIN
 app.post("/login", async (req, res) => {
@@ -97,30 +110,30 @@ app.post("/login", async (req, res) => {
 });
 
 // PRODUCTS
-app.get("/products", async (req, res) => {
-  try {
-    const result = await db.query("SELECT * FROM products ORDER BY name");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to load products" });
-  }
-});
+// app.get("/products", async (req, res) => {
+//   try {
+//     const result = await db.query("SELECT * FROM products ORDER BY name");
+//     res.json(result.rows);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Failed to load products" });
+//   }
+// });
 
 // SEARCH
-app.get("/search", async (req, res) => {
-  const { q } = req.query;
-  try {
-    const result = await db.query(
-      "SELECT * FROM products WHERE name ILIKE $1 ORDER BY name",
-      [`%${q}%`]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Search failed" });
-  }
-});
+// app.get("/search", async (req, res) => {
+//   const { q } = req.query;
+//   try {
+//     const result = await db.query(
+//       "SELECT * FROM products WHERE name ILIKE $1 ORDER BY name",
+//       [`%${q}%`]
+//     );
+//     res.json(result.rows);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Search failed" });
+//   }
+// });
 
 // CART.   Arslan Part working
 app.post("/cart/add", authMiddleware, async (req, res) => {

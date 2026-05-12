@@ -1,0 +1,75 @@
+const express = require("express");
+const router = express.Router();
+
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const db = require("../db/db");
+const authMiddleware = require("../middleware/authMiddleware");
+
+
+// Display Name
+router.get("/me", authMiddleware, async (req, res) => {
+
+  const result = await db.query(
+    `SELECT customer_id, email, display_name
+     FROM customers
+     WHERE customer_id = $1`,
+    [req.customer_id]
+  );
+
+  res.json(result.rows[0]);
+});
+
+// Register
+router.post("/register", async (req, res) => {
+    const { email, displayName, password } = req.body;
+
+    const hashed = await bcrypt.hash(password, 10);
+
+    try {
+        await db.query(
+            `INSERT INTO customers (email, display_name, password_hash)
+             VALUES ($1, $2, $3)`,
+            [email, displayName, hashed]
+        );
+
+        res.json({ message: "Account created" });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ error: "Email already exists" });
+    }
+});
+
+
+// LOGIN
+router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    const result = await db.query(
+        `SELECT * FROM customers WHERE email = $1`,
+        [email]
+    );
+
+    if (result.rows.length === 0) {
+        return res.status(400).json({ error: "No such user" });
+    }
+
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password_hash);
+
+    if (!match) {
+        return res.status(400).json({ error: "Wrong password" });
+    }
+
+    const token = jwt.sign(
+        { customer_id: user.customer_id },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+    );
+
+    res.json({ token });
+});
+
+
+module.exports = router;
