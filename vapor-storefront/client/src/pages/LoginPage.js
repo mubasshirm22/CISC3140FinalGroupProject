@@ -31,11 +31,11 @@ function LoginPage() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
 
-        const userProfile = data.user || { 
-          display_name: email.split('@')[0].toUpperCase(),
-          email: email 
-        };
-        localStorage.setItem('user', JSON.stringify(userProfile));
+        localStorage.setItem('user', JSON.stringify({
+          display_name: data.display_name,
+          email: email,
+          is_admin: data.is_admin
+        }));
         
         window.location.href = "/"; 
       } else {

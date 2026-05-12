@@ -9,6 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+//Middleware stuff
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -29,11 +30,32 @@ function authMiddleware(req, res, next) {
   }
 }
 
+const adminRoutes = require("./routes/admin");
+// Extract token if present (non-blocking)
+app.use((req, res, next) => {
+  const auth = req.headers.authorization;
+  if (!auth) return next();
+
+  const token = auth.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.customer_id = decoded.customer_id;
+  } catch (err) {
+    console.log("Token decode failed:", err);
+  }
+
+  next();
+});
+
+app.use("/admin", adminRoutes);
+
+
+
 
 // Connect to PostgreSQL
-const db = new Pool({
-    connectionString: process.env.DATABASE_URL
-});
+const db = require("./db");
+
 
 // Display Name
 app.get("/me", authMiddleware, async (req, res) => {
@@ -91,7 +113,11 @@ app.post("/login", async (req, res) => {
         { expiresIn: "7d" }
     );
 
-    res.json({ token });
+    res.json({
+      token,
+      display_name: user.display_name,
+      is_admin: user.is_admin
+    });
 });
 
 // PRODUCTS
