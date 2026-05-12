@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getGuestCart } from '../pages/CartPage';
 import '../style/Navbar.css';
 
 function Navbar() {
@@ -8,35 +9,39 @@ function Navbar() {
   const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      setUser(JSON.parse(userJson));
+  const refreshCartCount = useCallback(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch('http://localhost:8080/cart', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(r => r.json())
+        .then(data => { if (Array.isArray(data)) setCartCount(data.length); })
+        .catch(() => {});
+    } else {
+      // guest cart count from localStorage
+      setCartCount(getGuestCart().length);
     }
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    const userJson = localStorage.getItem('user');
+    if (userJson) setUser(JSON.parse(userJson));
+    refreshCartCount();
 
-    fetch('http://localhost:8080/cart', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setCartCount(data.length);
-      })
-      .catch(err => console.error("Cart fetch error:", err));
-  }, []);
+    // listen for cart changes from any page
+    window.addEventListener('cartUpdated', refreshCartCount);
+    return () => window.removeEventListener('cartUpdated', refreshCartCount);
+  }, [refreshCartCount]);
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/login";
+    window.location.href = '/login';
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchInput.trim() === '') return;
+    if (!searchInput.trim()) return;
     navigate(`/?q=${encodeURIComponent(searchInput.trim())}`);
   };
 
@@ -56,7 +61,7 @@ function Navbar() {
               className="search-input"
               placeholder="Search games..."
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={e => setSearchInput(e.target.value)}
             />
             <button type="submit" className="search-button">Search</button>
           </form>
@@ -73,6 +78,9 @@ function Navbar() {
             </div>
           ) : (
             <div className="auth-group">
+              <Link to="/cart" className="nav-link cart-link">
+                CART {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+              </Link>
               <Link to="/login" className="nav-link">LOGIN</Link>
               <span className="nav-sep">|</span>
               <Link to="/register" className="nav-link">REGISTER</Link>

@@ -68,3 +68,14 @@
     font-weight: bold;
     margin-left: 5px;
   }
+
+  /* added: inline error message instead of alert() */
+  .auth-error {
+    background: #2a1010;
+    border-left: 3px solid #f44336;
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    border-radius: 2px;
+  }

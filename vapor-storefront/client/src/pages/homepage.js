@@ -1,11 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { addToGuestCart } from './CartPage';
 import '../style/HomePage.css';
+
+// per-game gradient by name keyword
+function getGameGradient(name = '') {
+  const n = name.toLowerCase();
+  if (n.includes('dungeon'))   return 'linear-gradient(135deg, #1a0533, #3d1a6e)';
+  if (n.includes('space'))     return 'linear-gradient(135deg, #0a1628, #1a3a6e)';
+  if (n.includes('twilight'))  return 'linear-gradient(135deg, #1a0808, #4a1515)';
+  if (n.includes('subway'))    return 'linear-gradient(135deg, #0a1820, #1a3040)';
+  if (n.includes('cheeze') || n.includes('chopped')) return 'linear-gradient(135deg, #1a1500, #3d3200)';
+  if (n.includes('soundtrack')) return 'linear-gradient(135deg, #0a1a1a, #1a3a3a)';
+  return 'linear-gradient(135deg, #16202d, #1b2838)';
+}
+
+function VaporScoreBar({ score }) {
+  const color = score >= 75 ? '#4caf50' : score >= 50 ? '#ffc107' : '#f44336';
+  const label = score >= 75 ? 'Very Positive' : score >= 50 ? 'Mixed' : 'Negative';
+  return (
+    <div className="vapor-score-wrap">
+      <div className="vapor-score-bar-bg">
+        <div className="vapor-score-bar-fill" style={{ width: `${score}%`, background: color }} />
+      </div>
+      <span className="vapor-score-label" style={{ color }}>{score}% — {label}</span>
+    </div>
+  );
+}
+
+const CATEGORIES = ['All', 'Action', 'Adventure', 'Roguelike', 'Open World', 'DLC'];
 
 function HomePage() {
   const [games, setGames] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [addedId, setAddedId] = useState(null); // brief "Added!" feedback
   const location = useLocation();
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -13,52 +45,128 @@ function HomePage() {
 
     if (q) {
       setSearchTerm(q);
+      setActiveCategory('All');
       fetch(`http://localhost:8080/search?q=${encodeURIComponent(q)}`)
-        .then(res => res.json())
-        .then(data => setGames(data))
-        .catch(err => console.error("Search error:", err));
+        .then(r => r.json())
+        .then(data => { setGames(data); setFiltered(data); })
+        .catch(err => console.error('Search error:', err));
     } else {
       setSearchTerm('');
       fetch('http://localhost:8080/products')
-        .then(res => res.json())
-        .then(data => setGames(data))
-        .catch(err => console.error("Fetch error:", err));
+        .then(r => r.json())
+        .then(data => { setGames(data); setFiltered(data); })
+        .catch(err => console.error('Fetch error:', err));
     }
   }, [location.search]);
 
+  // apply sidebar filter
+  useEffect(() => {
+    if (activeCategory === 'All') {
+      setFiltered(games);
+    } else if (activeCategory === 'DLC') {
+      setFiltered(games.filter(g => g.is_dlc || g.genre === 'DLC'));
+    } else {
+      setFiltered(games.filter(g => g.genre === activeCategory));
+    }
+  }, [activeCategory, games]);
+
+  const handleAddToCart = async (e, game) => {
+    e.preventDefault(); // don't navigate to game detail
+    if (token) {
+      await fetch('http://localhost:8080/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ product_id: game.product_id })
+      });
+    } else {
+      addToGuestCart(game);
+    }
+    setAddedId(game.product_id);
+    window.dispatchEvent(new Event('cartUpdated'));
+    setTimeout(() => setAddedId(null), 1500);
+  };
+
+  // featured = highest vapor_score game
+  const featured = [...games].sort((a, b) => (b.vapor_score || 0) - (a.vapor_score || 0))[0];
+
   return (
     <div className="home-container">
-      <div className="hero-section">
-        <h2 className="hero-title">Featured & Recommended</h2>
-      </div>
+
+      {/* hero — shows the top-rated game */}
+      {featured && (
+        <div className="hero-section" style={{ background: `${getGameGradient(featured.name).replace('linear-gradient', 'linear-gradient')}, #1b2838` }}>
+          <div className="hero-inner" style={{ background: getGameGradient(featured.name) }}>
+            <div className="hero-overlay">
+              <div className="hero-badge">Featured &amp; Recommended</div>
+              <h2 className="hero-game-title">{featured.name}</h2>
+              <p className="hero-game-desc">{featured.description}</p>
+              <div className="hero-meta">
+                {featured.genre && <span className="hero-genre-tag">{featured.genre}</span>}
+                {featured.vapor_score && <span className="hero-score">⬆ {featured.vapor_score}% Positive</span>}
+                <Link to={`/game/${featured.product_id}`} className="hero-btn">View Game</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="main-content">
+        {/* sidebar */}
         <aside className="sidebar">
-          <h4>GIFT CARDS</h4>
+          <h4>CATEGORIES</h4>
           <ul className="sidebar-list">
-            <li style={{ color: '#fff', fontWeight: 'bold' }}>New Releases</li>
-            <li>Specials</li>
-            <li>Free Games</li>
-            <li>By Genre</li>
+            {CATEGORIES.map(cat => (
+              <li
+                key={cat}
+                className={activeCategory === cat ? 'sidebar-item active' : 'sidebar-item'}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </li>
+            ))}
           </ul>
         </aside>
 
+        {/* game grid */}
         <section className="game-grid">
-          {games.length === 0 ? (
+          {searchTerm && (
+            <p className="search-label">Results for "{searchTerm}"</p>
+          )}
+          {filtered.length === 0 ? (
             searchTerm
-              ? <p style={{ color: '#66c0f4' }}>No products found for "{searchTerm}".</p>
-              : <p style={{ color: '#66c0f4' }}>Syncing with Database...</p>
+              ? <p className="empty-msg">No games found for "{searchTerm}".</p>
+              : <p className="empty-msg">Syncing with database...</p>
           ) : (
-            games.map(game => (
+            filtered.map(game => (
               <Link to={`/game/${game.product_id}`} key={game.product_id} className="game-card">
-                <img src={game.image_url} alt={game.name} style={{ width: '100%' }} />
-                <div style={{ padding: '15px' }}>
-                  <div style={{ color: '#fff', fontSize: '1.1rem', marginBottom: '8px' }}>{game.name}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div className="discount-tag">-20%</div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ color: '#fff', fontSize: '1rem' }}>${game.price}</div>
+                {/* gradient image placeholder; replaced by real image_url if available */}
+                {game.image_url ? (
+                  <img src={game.image_url} alt={game.name} className="game-card-img" />
+                ) : (
+                  <div className="game-card-img-placeholder" style={{ background: getGameGradient(game.name) }}>
+                    <span className="placeholder-title">{game.name}</span>
+                  </div>
+                )}
+
+                <div className="game-card-body">
+                  <div className="game-card-header">
+                    <span className="game-card-name">{game.name}</span>
+                    {game.genre && <span className="genre-tag">{game.genre}</span>}
+                  </div>
+
+                  {game.vapor_score != null && <VaporScoreBar score={game.vapor_score} />}
+
+                  <div className="game-card-footer">
+                    <div className="price-group">
+                      {game.vapor_score < 60 && <span className="discount-tag">-20%</span>}
+                      <span className="game-price">${Number(game.price).toFixed(2)}</span>
                     </div>
+                    <button
+                      className={`add-cart-btn ${addedId === game.product_id ? 'added' : ''}`}
+                      onClick={(e) => handleAddToCart(e, game)}
+                    >
+                      {addedId === game.product_id ? '✓ Added' : '+ Cart'}
+                    </button>
                   </div>
                 </div>
               </Link>
