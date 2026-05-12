@@ -1,0 +1,207 @@
+/* Container layout */
+.admin-container {
+  display: flex;
+  height: calc(100vh - 60px); /* below navbar */
+  background: #0b0f19;
+  color: #f3f4f6;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 220px;
+  background: #111827;
+  padding: 20px;
+  border-right: 1px solid #1f2937;
+}
+
+.admin-title {
+  color: #00aaff;
+  font-size: 22px;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+/* Sidebar links */
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-link {
+  color: #9ca3af;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 0;
+  transition: 0.2s;
+}
+
+.admin-link:hover {
+  color: #00aaff;
+  padding-left: 6px;
+}
+
+/* Main content */
+.admin-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Page title + Add button row */
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.admin-page-title {
+  font-size: 28px;
+  color: #00aaff;
+}
+
+/* Add Product button */
+.admin-add-btn {
+  background: #00aaff;
+  color: #0b0f19;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-add-btn:hover {
+  background: #33c7ff;
+}
+
+/* Product table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #111827;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid #1f2937;
+  text-align: left;
+}
+
+.admin-table th {
+  background: #0d121f;
+  color: #00aaff;
+  font-weight: bold;
+}
+
+/* Image thumbnails */
+.admin-product-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.admin-products {
+  padding-top: 40px;
+}
+
+/* Edit/Delete buttons */
+.admin-edit-btn,
+.admin-delete-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.admin-edit-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.admin-edit-btn:hover {
+  background: #3b82f6;
+}
+
+.admin-delete-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.admin-delete-btn:hover {
+  background: #ef4444;
+}
+
+/* --------Edit Section-------- */
+
+.admin-editor {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-form input,
+.admin-form textarea {
+  background: #0d121f;
+  border: 1px solid #1f2937;
+  padding: 10px;
+  border-radius: 6px;
+  color: #f3f4f6;
+}
+
+.admin-editor-preview {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-top: 10px;
+  border: 1px solid #1f2937;
+}
+
+.admin-save-btn {
+  background: #00aaff;
+  color: #0b0f19;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.admin-cancel-btn {
+  background: #6b7280;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Cloudinary upload button */
+
+.admin-upload-btn {
+  background: #2563eb;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.admin-upload-btn:hover {
+  background: #3b82f6;
+}
+

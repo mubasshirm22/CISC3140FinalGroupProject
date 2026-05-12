@@ -70,6 +70,11 @@ function Navbar() {
         <div className="nav-right">
           {user ? (
             <div className="user-logged-in">
+
+              {user.is_admin && (
+                <Link to="/admin" className="nav-link">ADMIN</Link>
+              )}
+
               <Link to="/cart" className="nav-link cart-link">
                 CART {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
               </Link>

@@ -9,8 +9,7 @@ const authMiddleware = require("./middleware/authMiddleware.js");
 const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const libraryRoutes = require("./routes/libraryRoutes");
-
-
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 app.use(express.json());
@@ -19,7 +18,7 @@ app.use("/", productRoutes);
 app.use("/", authRoutes);
 app.use("/cart", cartRoutes);
 app.use("/library", libraryRoutes);
-
+app.use("/admin", adminRoutes);
 
 
 // TEST ROUTE
