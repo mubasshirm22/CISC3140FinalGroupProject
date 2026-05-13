@@ -205,9 +205,139 @@
   letter-spacing: 0.5px;
 }
 
+
+/* =========================
+   CHECKOUT MODAL
+========================= */
+
+.checkout-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: rgba(0, 0, 0, 0.75);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+}
+
+.checkout-modal {
+    width: 420px;
+
+    background: #16202d;
+
+    border: 1px solid #2a475e;
+
+    border-radius: 12px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 0 20px rgba(0,0,0,0.5);
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.checkout-modal h2 {
+    color: white;
+
+    font-size: 28px;
+
+    margin-bottom: 10px;
+
+    text-align: center;
+}
+
+
+.gift-input {
+    width: 100%;
+
+    padding: 14px;
+
+    background: #1b2838;
+
+    border: 1px solid #2a475e;
+
+    border-radius: 8px;
+
+    color: white;
+
+    font-size: 16px;
+
+    outline: none;
+
+    box-sizing: border-box;
+}
+
+.gift-input::placeholder {
+    color: #8f98a0;
+}
+
+
+
+.gift-generate-btn,
+.gift-complete-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.gift-generate-btn {
+    background: #2a475e;
+    color: #66c0f4;
+}
+
+.gift-generate-btn:hover {
+    background: #365b77;
+}
+
+.gift-complete-btn {
+
+    background:
+        linear-gradient(
+            90deg,
+            #4db8ff,
+            #1f4bd8
+        );
+
+    color: white;
+}
+
+.gift-complete-btn:hover {
+    transform: scale(1.02);
+}
+
+
+
+.cart-success {
+    background: #1e3a28;
+    border: 1px solid #4caf50;
+    color: #7CFC98;
+    padding: 18px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
 .cart-checkout-btn:hover { background: #47bfff; color: #000; }
 
 @media (max-width: 700px) {
   .cart-layout { grid-template-columns: 1fr; }
   .cart-summary { position: static; }
 }
+
+
+

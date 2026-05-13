@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const libraryRoutes = require("./routes/libraryRoutes");
 const adminRoutes = require("./routes/admin");
+const checkoutRoutes = require("./routes/checkoutRoutes");
 
 const app = express();
 app.use(express.json());
@@ -20,7 +21,7 @@ app.use("/cart", cartRoutes);
 app.use("/library", libraryRoutes);
 app.use("/admin", authMiddleware);
 app.use("/admin", adminRoutes);
-
+app.use("/checkout", checkoutRoutes);
 
 // TEST ROUTE
 app.get("/", (req, res) => {
