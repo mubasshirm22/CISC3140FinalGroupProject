@@ -281,57 +281,6 @@
 }
 
 
-
-.gift-generate-btn,
-.gift-complete-btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.gift-generate-btn {
-    background: #2a475e;
-    color: #66c0f4;
-}
-
-.gift-generate-btn:hover {
-    background: #365b77;
-}
-
-.gift-complete-btn {
-
-    background:
-        linear-gradient(
-            90deg,
-            #4db8ff,
-            #1f4bd8
-        );
-
-    color: white;
-}
-
-.gift-complete-btn:hover {
-    transform: scale(1.02);
-}
-
-
-
-.cart-success {
-    background: #1e3a28;
-    border: 1px solid #4caf50;
-    color: #7CFC98;
-    padding: 18px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-size: 18px;
-    font-weight: 600;
-}
-
 .cart-checkout-btn:hover { background: #47bfff; color: #000; }
 
 @media (max-width: 700px) {
@@ -339,5 +288,169 @@
   .cart-summary { position: static; }
 }
 
+/* GIFT CARD SECTION ON PAGE */
+.gift-card-section {
+  background: #000;
+  padding: 40px;
+  margin-top: 40px;
+  border-radius: 8px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.gift-card-display {
+  margin-bottom: 25px;
+}
 
+.gift-card-display label {
+  display: block;
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.gift-input-display {
+  width: 100%;
+  padding: 15px;
+  background: #1b2838;
+  border: 2px solid #2a475e;
+  border-radius: 4px;
+  color: #66c0f4;
+  font-size: 18px;
+  box-sizing: border-box;
+  text-align: center;
+  font-weight: bold;
+}
+
+.gift-input-display::placeholder {
+  color: #8b8b8b;
+}
+
+.gift-amount-inline {
+  font-size: 24px;
+  font-weight: bold;
+  color: #66c0f4;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.gift-generate-btn-inline {
+  width: 100%;
+  padding: 15px;
+  background: #5c7e10;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gift-generate-btn-inline:hover {
+  background: #6d9419;
+}
+
+/* MODAL POPUP */
+.checkout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.checkout-modal {
+  background: #1b2838;
+  padding: 40px;
+  border-radius: 8px;
+  min-width: 400px;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.checkout-modal h2 {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.gift-input {
+  width: 100%;
+  padding: 12px;
+  background: #2a475e;
+  border: 1px solid #417a9b;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.gift-input::placeholder {
+  color: #8b8b8b;
+}
+
+.modal-error {
+  background: #8b1a1a;
+  color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.gift-complete-btn {
+  width: 100%;
+  padding: 12px;
+  background: #66c0f4;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 10px;
+}
+
+.gift-complete-btn:hover {
+  background: #54a3d8;
+}
+
+.gift-cancel-btn {
+  width: 100%;
+  padding: 12px;
+  background: #3d4450;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gift-cancel-btn:hover {
+  background: #4d5560;
+}
+
+.gift-card-error {
+  background: #8b1a1a;
+  color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: bold;
+}

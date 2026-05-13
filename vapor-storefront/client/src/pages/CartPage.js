@@ -43,9 +43,11 @@ function CartPage() {
   const [loading, setLoading] = useState(true);
 
   const [checkoutMsg, setCheckoutMsg] = useState('');
+  const [giftCardError, setGiftCardError] = useState('');
 
   const [showModal, setShowModal] = useState(false);
-  const [giftCode, setGiftCode] = useState('');
+  const [giftCard, setGiftCard] = useState({ number: '', amount: 0 });
+  const [enteredCard, setEnteredCard] = useState('');
 
   const navigate = useNavigate();
 
@@ -105,36 +107,71 @@ function CartPage() {
     window.dispatchEvent(new Event('cartUpdated'));
   };
 
-    const handleCheckout = async () => {
+  const handlePurchaseClick = () => {
+    // Clear previous messages
+    setCheckoutMsg('');
+    setGiftCardError('');
+
+    // user not logged in
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    // no items
+    if (items.length === 0) {
+      setCheckoutMsg('Your cart is empty.');
+      return;
+    }
+
+    // Check if gift card was generated
+    if (!giftCard.number || giftCard.amount === 0) {
+      setGiftCardError('Please generate a gift card first.');
+      return;
+    }
+
+    // Open modal
+    setShowModal(true);
+  };
+
+  const handleCheckout = async () => {
 
     try {
 
-      // user not logged in
-      if (!token) {
+      // Clear previous errors
+      setGiftCardError('');
 
-        navigate('/login');
-
+      // Check if user entered card number
+      if (!enteredCard.trim()) {
+        setGiftCardError('Please enter the gift card number.');
         return;
       }
 
-      // no items
-      if (items.length === 0) {
-
-        setCheckoutMsg(
-          'Your cart is empty.'
-        );
-
+      // Check if entered card matches generated card
+      if (enteredCard.trim() !== giftCard.number) {
+        setGiftCardError('Invalid gift card number. Please enter the correct card number.');
         return;
       }
 
-      // collect product ids
-      const ids = items.map(
-        i => i.product_id
+      // Calculate total
+      const total = items.reduce(
+        (sum, i) => sum + Number(i.price) * (i.quantity || 1),
+        0
       );
+
+      // Check if gift card balance is sufficient
+      if (giftCard.amount < total) {
+        setGiftCardError(
+          `Insufficient balance. Your gift card has $${giftCard.amount}.00 but cart total is $${total.toFixed(2)}. Please generate another gift card or remove items from cart.`
+        );
+        return;
+      }
+
+      // All checks passed - proceed with checkout
+      const ids = items.map(i => i.product_id);
 
       console.log('CHECKOUT ITEMS:', ids);
 
-      // backend request
       const res = await fetch(
         'http://localhost:8080/checkout',
         {
@@ -151,17 +188,11 @@ function CartPage() {
         }
       );
 
-      console.log(
-        'CHECKOUT STATUS:',
-        res.status
-      );
+      console.log('CHECKOUT STATUS:', res.status);
 
       const data = await res.json();
 
-      console.log(
-        'CHECKOUT RESPONSE:',
-        data
-      );
+      console.log('CHECKOUT RESPONSE:', data);
 
       // success
       if (res.ok) {
@@ -169,11 +200,11 @@ function CartPage() {
         setItems([]);
 
         setCheckoutMsg(
-          'Payment Successful! Thank you for purchasing from Vapor Store. Enjoy your game.'
+          `Payment Successful! Used $${total.toFixed(2)} from your gift card. Remaining balance: $${(giftCard.amount - total).toFixed(2)}. Thank you for purchasing from Vapor Store. Enjoy your game.`
         );
 
-        setGiftCode('');
-
+        setGiftCard({ number: '', amount: 0 });
+        setEnteredCard('');
         setShowModal(false);
 
         // update navbar cart count
@@ -183,7 +214,7 @@ function CartPage() {
 
       } else {
 
-        setCheckoutMsg(
+        setGiftCardError(
           data.error ||
           'Checkout failed.'
         );
@@ -197,33 +228,29 @@ function CartPage() {
         err
       );
 
-      setCheckoutMsg(
+      setGiftCardError(
         'Server error during checkout.'
       );
     }
   };
-  const generateGiftCode = () => {
-
-    const chars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-    let code = 'VAPOR-';
-
-    for (let i = 0; i < 4; i++) {
-      code += chars[
-        Math.floor(Math.random() * chars.length)
-      ];
+  
+  const generateGiftCard = () => {
+    // Generate 16-digit card number
+    let cardNumber = '';
+    for (let i = 0; i < 16; i++) {
+      cardNumber += Math.floor(Math.random() * 10);
+      // Add dash every 4 digits
+      if ((i + 1) % 4 === 0 && i !== 15) {
+        cardNumber += '-';
+      }
     }
 
-    code += '-';
+    // Generate random amount between $70-$100
+    const amount = Math.floor(Math.random() * 31) + 70; // 70 to 100
 
-    for (let i = 0; i < 4; i++) {
-      code += chars[
-        Math.floor(Math.random() * chars.length)
-      ];
-    }
-
-    setGiftCode(code);
+    setGiftCard({ number: cardNumber, amount });
+    setEnteredCard(''); // Clear entered card
+    setGiftCardError(''); // Clear any errors
   };
 
   const total = items.reduce(
@@ -376,11 +403,17 @@ function CartPage() {
 
             </div>
 
+            {giftCardError && !showModal && (
+              <div className="gift-card-error">
+                {giftCardError}
+              </div>
+            )}
+
             {token ? (
 
               <button
                 className="cart-checkout-btn"
-                onClick={() => setShowModal(true)}
+                onClick={handlePurchaseClick}
               >
                 Purchase
               </button>
@@ -402,6 +435,36 @@ function CartPage() {
 
       )}
 
+      {/* GIFT CARD GENERATION - INLINE ON PAGE */}
+      <div className="gift-card-section">
+        
+        <div className="gift-card-display">
+          <label>Generated Gift Card:</label>
+          <input
+            type="text"
+            placeholder="Click 'Generate Gift Card' below"
+            value={giftCard.number}
+            readOnly
+            className="gift-input-display"
+          />
+
+          {giftCard.amount > 0 && (
+            <div className="gift-amount-inline">
+              Balance: ${giftCard.amount}.00
+            </div>
+          )}
+        </div>
+
+        <button
+          className="gift-generate-btn-inline"
+          onClick={generateGiftCard}
+        >
+          Generate Gift Card
+        </button>
+
+      </div>
+
+      {/* MODAL FOR ENTERING CARD NUMBER */}
       {showModal && (
 
         <div className="checkout-modal-overlay">
@@ -409,37 +472,39 @@ function CartPage() {
           <div className="checkout-modal">
 
             <h2>
-              Complete Purchase
+              Enter Gift Card Number
             </h2>
 
             <input
               type="text"
-              placeholder="Enter Gift Card"
-              value={giftCode}
-              onChange={(e) =>
-                setGiftCode(e.target.value)
-              }
+              placeholder="Enter the card number above"
+              value={enteredCard}
+              onChange={(e) => setEnteredCard(e.target.value)}
               className="gift-input"
             />
 
-            <button
-              className="gift-generate-btn"
-              onClick={generateGiftCode}
-            >
-              Generate Gift Card
-            </button>
+            {giftCardError && (
+              <div className="modal-error">
+                {giftCardError}
+              </div>
+            )}
 
             <button
               className="gift-complete-btn"
-              onClick={async () => {
-
-                await handleCheckout();
-
-                setShowModal(false);
-
-              }}
+              onClick={handleCheckout}
             >
               Complete Purchase
+            </button>
+
+            <button
+              className="gift-cancel-btn"
+              onClick={() => {
+                setShowModal(false);
+                setGiftCardError('');
+                setEnteredCard('');
+              }}
+            >
+              Cancel
             </button>
 
           </div>
