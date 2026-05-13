@@ -18,6 +18,7 @@ app.use("/", productRoutes);
 app.use("/", authRoutes);
 app.use("/cart", cartRoutes);
 app.use("/library", libraryRoutes);
+app.use("/admin", authMiddleware);
 app.use("/admin", adminRoutes);
 
 
