@@ -12,6 +12,7 @@ const checkoutRoutes = require("./routes/checkoutRoutes");
 const libraryRoutes = require("./routes/libraryRoutes");
 const adminRoutes = require("./routes/admin");
 const steamRoutes = require("./routes/steamRoutes");
+const ordersRouter = require("./routes/orders");
 
 const app = express();
 app.use(express.json());
@@ -24,7 +25,7 @@ app.use("/library", libraryRoutes);
 app.use("/steam", steamRoutes);
 app.use("/admin", authMiddleware);
 app.use("/admin", adminRoutes);
-
+app.use("/api/orders", ordersRouter);
 
 // TEST ROUTE
 app.get("/", (req, res) => {

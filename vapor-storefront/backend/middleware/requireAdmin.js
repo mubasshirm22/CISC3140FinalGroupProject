@@ -1,4 +1,4 @@
-const db = require("../db");
+const db = require('../db/db.js');
 
 module.exports = async function requireAdmin(req, res, next) {
   if (!req.customer_id) {

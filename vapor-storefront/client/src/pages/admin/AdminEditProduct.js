@@ -36,7 +36,15 @@ function AdminEditProduct() {
 
   const [loading, setLoading] = useState(!isNew);
 
-  const loadProduct = useCallback(async () => {
+useEffect(() => {
+  if (!isNew) {
+    loadProduct();
+  }
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isNew]);
+
+  const loadProduct = async () => {
     try {
       const token = localStorage.getItem("token");
 
