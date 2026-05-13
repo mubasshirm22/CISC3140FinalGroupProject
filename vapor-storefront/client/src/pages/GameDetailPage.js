@@ -1,9 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { addToGuestCart } from './CartPage';
-import { fetchGameById, getGameThumbnailSrc } from '../services/storefrontService';
-import { getGameGradient } from '../services/themeUtils';
 import '../style/GameDetail.css';
+
+function VaporScoreBar({ score }) {
+  const color = score >= 75 ? '#4caf50' : score >= 50 ? '#ffc107' : '#f44336';
+  const label = score >= 75 ? 'Very Positive' : score >= 50 ? 'Mixed' : 'Negative';
+  return (
+    <div className="detail-score-wrap">
+      <div className="detail-score-bar-bg">
+        <div className="detail-score-bar-fill" style={{ width: `${score}%`, background: color }} />
+      </div>
+      <span className="detail-score-text" style={{ color }}>{score}% — {label}</span>
+    </div>
+  );
+}
 
 // PC compatibility checker — compares user input against min_specs from DB
 function CompatChecker({ minSpecs }) {
@@ -67,70 +78,17 @@ function GameDetail() {
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cartMsg, setCartMsg] = useState('');
-  const [currentShotIndex, setCurrentShotIndex] = useState(0);
-  const [zoomOpen, setZoomOpen] = useState(false);
   const token = localStorage.getItem('token');
 
-  const screenshots = game && Array.isArray(game.screenshots) && game.screenshots.length > 0
-    ? game.screenshots
-    : game
-      ? getScreenshots(game)
-      : [];
-
-  const nextScreenshot = useCallback(() => {
-    if (screenshots.length <= 1) {
-      return;
-    }
-    setCurrentShotIndex((prev) => (prev + 1) % screenshots.length);
-  }, [screenshots.length]);
-
-  const prevScreenshot = useCallback(() => {
-    if (screenshots.length <= 1) {
-      return;
-    }
-    setCurrentShotIndex((prev) => (prev === 0 ? screenshots.length - 1 : prev - 1));
-  }, [screenshots.length]);
-
   useEffect(() => {
-    fetchGameById(id)
+    fetch('http://localhost:8080/products')
+      .then(r => r.json())
       .then(data => {
-        setGame(data || null);
-        setCurrentShotIndex(0);
-        setZoomOpen(false);
+        setGame(data.find(p => p.product_id === id) || null);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, [id]);
-
-  useEffect(() => {
-    if (!screenshots.length) {
-      return;
-    }
-
-    const handleKeydown = (event) => {
-      const targetTag = String(event.target?.tagName || '').toLowerCase();
-      if (targetTag === 'input' || targetTag === 'textarea' || targetTag === 'select') {
-        return;
-      }
-
-      if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        nextScreenshot();
-      }
-
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        prevScreenshot();
-      }
-
-      if (event.key === 'Escape' && zoomOpen) {
-        setZoomOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeydown);
-    return () => window.removeEventListener('keydown', handleKeydown);
-  }, [nextScreenshot, prevScreenshot, screenshots.length, zoomOpen]);
 
   const handleAddToCart = async () => {
     if (token) {
@@ -149,210 +107,90 @@ function GameDetail() {
     setTimeout(() => setCartMsg(''), 2500);
   };
 
-  if (loading) return <div className="steamdb-detail-container"><p style={{ padding: '40px 20px', color: '#66c0f4' }}>Loading...</p ></div>;
-  if (!game)   return <div className="steamdb-detail-container"><p style={{ padding: '40px 20px', color: '#ff6b6b' }}>Game not found.</p ></div>;
-
-  const steamPlatforms = Array.isArray(game.steam?.platforms) && game.steam.platforms.length > 0
-    ? game.steam.platforms.join(', ')
-    : 'Windows';
-
-  const steamDevelopers = Array.isArray(game.steam?.developers) && game.steam.developers.length > 0
-    ? game.steam.developers.join(', ')
-    : 'Unknown';
-
-  const steamPublishers = Array.isArray(game.steam?.publishers) && game.steam.publishers.length > 0
-    ? game.steam.publishers.join(', ')
-    : 'Unknown';
-
-  const steamRating = game.steam?.content_rating || 'Not rated';
-  const steamReleaseDate = game.steam?.release_date || 'TBA';
-  const technicalType = game.is_dlc
-    ? 'Downloadable Content'
-    : (Array.isArray(game.steam?.categories) && game.steam.categories.includes('Game') ? 'Full Game' : 'Game');
-
-  const gameTitle = game.title || game.name;
-  const gamePrice = Number(game.price || 0).toFixed(2);
+  if (loading) return <div className="steamdb-detail-container"><p style={{ padding: '40px 20px', color: '#66c0f4' }}>Loading...</p></div>;
+  if (!game)   return <div className="steamdb-detail-container"><p style={{ padding: '40px 20px', color: '#ff6b6b' }}>Game not found.</p></div>;
 
   return (
     <div className="steamdb-detail-container">
-      <header className="epic-detail-header">
-        <h1 className="epic-detail-title">{gameTitle}</h1>
-        <div className="epic-detail-tabs" role="tablist" aria-label="Game detail sections">
-          <button type="button" className="epic-tab active" role="tab" aria-selected="true">Overview</button>
+      {/* header */}
+      <div className="db-header">
+        <div className="db-header-content">
+          <div className="db-app-icon-wrap" style={{ background: getGameGradient(game.name) }}>
+            {game.image_url && <img src={game.image_url} alt={game.name} className="db-app-icon" />}
+          </div>
+          <div className="db-title-area">
+            <h1 className="db-app-name">{game.name}</h1>
+            {game.genre && <span className="db-genre-badge">{game.genre}</span>}
+            {game.vapor_score != null && <VaporScoreBar score={game.vapor_score} />}
+          </div>
+          <div className="db-price-badge">
+            <div className="price-label">Store Price</div>
+            <div className="price-value">${Number(game.price).toFixed(2)}</div>
+          </div>
         </div>
-      </header>
-
-      <div className="epic-detail-main-grid">
-        <section className="epic-media-column">
-          <div className="epic-media-frame">
-            <button
-              type="button"
-              className="db-gallery-nav prev"
-              onClick={prevScreenshot}
-              aria-label="Previous screenshot"
-            >
-              ❮
-            </button>
-
-            <button
-              type="button"
-              className="db-gallery-current"
-              onClick={() => setZoomOpen(true)}
-              aria-label="Open screenshot preview"
-            >
-              <img
-                src={screenshots[currentShotIndex]}
-                alt={`Screenshot ${currentShotIndex + 1}`}
-                className="db-screenshot-current"
-              />
-            </button>
-
-            <button
-              type="button"
-              className="db-gallery-nav next"
-              onClick={nextScreenshot}
-              aria-label="Next screenshot"
-            >
-              ❯
-            </button>
-          </div>
-
-          <div className="epic-screenshot-strip">
-            {screenshots.map((src, index) => (
-              <button
-                type="button"
-                key={`${src}-${index}`}
-                className={`db-screenshot-thumb ${index === currentShotIndex ? 'active' : ''}`}
-                onClick={() => setCurrentShotIndex(index)}
-                aria-label={`Show screenshot ${index + 1}`}
-              >
-                < img src={src} alt={`Screenshot ${index + 1}`} className="db-screenshot" />
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <aside className="epic-buy-column">
-          <div className="epic-cover-wrap" style={{ background: getGameGradient(gameTitle) }}>
-            {getGameThumbnailSrc(game) && (
-              <img
-                src={getGameThumbnailSrc(game)}
-                alt={gameTitle}
-                className="db-app-icon"
-              />
-            )}
-          </div>
-
-          <span className="epic-base-tag">Base Game</span>
-          <div className="price-value">${gamePrice}</div>
-
-          <button className="epic-primary-btn" onClick={handleAddToCart}>Buy Now</button>
-
-          {!token && (
-            <p className="action-guest-note">
-              <Link to="/login">Sign in</Link> to checkout
-            </p >
-          )}
-
-          {cartMsg && <div className="cart-feedback">{cartMsg}</div>}
-
-          <div className="epic-meta-list">
-            <div className="epic-meta-row"><span>Developer</span><strong>{steamDevelopers}</strong></div>
-            <div className="epic-meta-row"><span>Publisher</span><strong>{steamPublishers}</strong></div>
-            <div className="epic-meta-row"><span>Release Date</span><strong>{steamReleaseDate}</strong></div>
-            <div className="epic-meta-row"><span>Platform</span><strong>{steamPlatforms}</strong></div>
-          </div>
-        </aside>
       </div>
 
       <div className="db-main-grid">
-        <section className="epic-info-card">
-          <div className="table-section-title">About This Game</div>
-          <div className="db-description-box">
-            {game.description || 'No description available.'}
-          </div>
-        </section>
-
-        <section className="epic-info-card">
+        {/* left: info + description + compat */}
+        <div className="db-info-table">
           <div className="table-section-title">Technical Information</div>
           <div className="db-row">
+            <div className="db-cell label">Developer</div>
+            <div className="db-cell value">Vapor Interactive</div>
+          </div>
+          <div className="db-row">
             <div className="db-cell label">Genre</div>
-            <div className="db-cell value">{game.genre || game.tags?.[0] || 'Unknown'}</div>
+            <div className="db-cell value">{game.genre || 'Action'}</div>
+          </div>
+          <div className="db-row">
+            <div className="db-cell label">Platform</div>
+            <div className="db-cell value">Windows, macOS, Linux</div>
           </div>
           <div className="db-row">
             <div className="db-cell label">Type</div>
-            <div className="db-cell value">{technicalType}</div>
-          </div>
-          <div className="db-row">
-            <div className="db-cell label">Rating</div>
-            <div className="db-cell value">{steamRating}</div>
+            <div className="db-cell value">{game.is_dlc ? 'Downloadable Content' : 'Full Game'}</div>
           </div>
 
-          <div style={{ marginTop: '24px' }}>
+          <div className="table-section-title" style={{ marginTop: '28px' }}>Description</div>
+          <div className="db-description-box">
+            {game.description || 'No description available.'}
+          </div>
+
+          {/* PC compatibility — unique feature */}
+          <div style={{ marginTop: '28px' }}>
             <CompatChecker minSpecs={game.min_specs} />
           </div>
-        </section>
-      </div>
+        </div>
 
-      {zoomOpen && screenshots[currentShotIndex] && (
-        <div className="db-lightbox" onClick={() => setZoomOpen(false)} role="presentation">
-          <div className="db-lightbox-inner" onClick={(event) => event.stopPropagation()} role="presentation">
-            <button
-              type="button"
-              className="db-lightbox-close"
-              onClick={() => setZoomOpen(false)}
-              aria-label="Close screenshot viewer"
-            >
-              ×
+        {/* right: action sidebar */}
+        <div className="db-sidebar">
+          <div className="db-action-card">
+            <div className="action-price">${Number(game.price).toFixed(2)}</div>
+            <button className="db-btn-cart" onClick={handleAddToCart}>
+              Add to Cart
             </button>
-            <button
-              type="button"
-              className="db-lightbox-nav prev"
-              onClick={prevScreenshot}
-              aria-label="Previous screenshot"
-            >
-              ❮
-            </button>
-            <img
-              src={screenshots[currentShotIndex]}
-              alt={`Zoomed screenshot ${currentShotIndex + 1}`}
-              className="db-lightbox-image"
-            />
-            <button
-              type="button"
-              className="db-lightbox-nav next"
-              onClick={nextScreenshot}
-              aria-label="Next screenshot"
-            >
-              ❯
-            </button>
+            {!token && (
+              <p className="action-guest-note">
+                <Link to="/login">Sign in</Link> to checkout
+              </p>
+            )}
+            {cartMsg && <div className="cart-feedback">{cartMsg}</div>}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
-function getScreenshots(game) {
-  if (game.image_url) {
-    return [game.image_url, game.image_url, game.image_url];
-  }
-
-  const baseUrl = 'https://via.placeholder.com/600x400/';
-  const colors = {
-    'Dungeon Crawler': '1a0533/ffffff?text=Dungeon+Screenshot',
-    'Space Adventure': '0a1628/ffffff?text=Space+Screenshot',
-    'The Legend of Greg: Twilight Handball': '1a0808/ffffff?text=Twilight+Screenshot',
-    'The Legend of Greg: Breath of the Subway': '0a1820/ffffff?text=Subway+Screenshot',
-    'The Legend of Greg: Chopped Cheeze of Time': '1a1500/ffffff?text=Cheeze+Screenshot',
-    'Soundtrack Collection': '0a1a1a/ffffff?text=Soundtrack+Screenshot'
-  };
-  const color = colors[game.name] || '16202d/ffffff?text=Game+Screenshot';
-  return [
-    `${baseUrl}${color}+1`,
-    `${baseUrl}${color}+2`,
-    `${baseUrl}${color}+3`
-  ];
+function getGameGradient(name = '') {
+  const n = name.toLowerCase();
+  if (n.includes('dungeon'))   return 'linear-gradient(135deg, #1a0533, #3d1a6e)';
+  if (n.includes('space'))     return 'linear-gradient(135deg, #0a1628, #1a3a6e)';
+  if (n.includes('twilight'))  return 'linear-gradient(135deg, #1a0808, #4a1515)';
+  if (n.includes('subway'))    return 'linear-gradient(135deg, #0a1820, #1a3040)';
+  if (n.includes('cheeze') || n.includes('chopped')) return 'linear-gradient(135deg, #1a1500, #3d3200)';
+  if (n.includes('soundtrack')) return 'linear-gradient(135deg, #0a1a1a, #1a3a3a)';
+  return 'linear-gradient(135deg, #16202d, #1b2838)';
 }
 
 export default GameDetail;

@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import "../../style/OriginGlobal.css";
+import "./admin.css";
 
 function AdminEditProduct() {
-  const { id } = useParams();
+  const { id } = useParams(); // "new" or product_id
   const navigate = useNavigate();
 
   const isNew = id === "new";
@@ -18,21 +18,21 @@ function AdminEditProduct() {
   });
 
   const openUploadWidget = () => {
-    window.cloudinary.openUploadWidget(
-      {
-        cloudName: "dswxezumx",
-        uploadPreset: "ml_default",
-        sources: ["local", "url", "camera"],
-        multiple: false,
-        cropping: false
-      },
-      (error, result) => {
-        if (!error && result && result.event === "success") {
-          setForm({ ...form, image_url: result.info.secure_url });
-        }
+  window.cloudinary.openUploadWidget(
+    {
+      cloudName: "dswxezumx",
+      uploadPreset: "ml_default",
+      sources: ["local", "url", "camera"],
+      multiple: false,
+      cropping: false
+    },
+    (error, result) => {
+      if (!error && result && result.event === "success") {
+        setForm({ ...form, image_url: result.info.secure_url });
       }
-    );
-  };
+    }
+  );
+};
 
   const [loading, setLoading] = useState(!isNew);
 
@@ -72,13 +72,8 @@ useEffect(() => {
       console.error("Failed to load product:", err);
       setLoading(false);
     }
-  }, [id]);
+  };
 
-  useEffect(() => {
-    if (!isNew) {
-      loadProduct();
-    }
-  }, [isNew, loadProduct]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -104,15 +99,15 @@ useEffect(() => {
     navigate("/admin/products");
   };
 
-  if (loading) return <p>Loading...</p >;
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="origin-editor">
-      <h1 className="origin-page-title">
+    <div className="admin-editor">
+      <h1 className="admin-page-title">
         {isNew ? "Add New Product" : "Edit Product"}
       </h1>
 
-      <div className="origin-form">
+      <div className="admin-form">
         <label>Name</label>
         <input
           name="name"
@@ -164,27 +159,23 @@ useEffect(() => {
 
         <button
           type="button"
-          className="origin-upload-btn"
+          className="admin-upload-btn"
           onClick={openUploadWidget}
         >
           Upload Image
         </button>
 
-        <div style={{ width: 120, aspectRatio: '3/4', borderRadius: 10, overflow: 'hidden', border: '1px solid #2a3c53', background: '#0c1625', margin: '12px 0' }}>
-          {form.image_url && (
-            <img
-              src={form.image_url}
-              alt="Preview"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-          )}
-        </div>
+        <img
+          src={form.image_url}
+          alt=""
+          className="admin-editor-preview"
+        />
 
-        <button className="origin-save-btn" onClick={handleSave}>
+        <button className="admin-save-btn" onClick={handleSave}>
           Save
         </button>
 
-        <button className="origin-cancel-btn" onClick={() => navigate("/admin/products")}>
+        <button className="admin-cancel-btn" onClick={() => navigate("/admin/products")}>
           Cancel
         </button>
       </div>

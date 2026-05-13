@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="navbar-container"></div>
+
+<script>
+  fetch("navbar.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("navbar-container").innerHTML = html;
+
+      const scripts = document
+        .getElementById("navbar-container")
+        .querySelectorAll("script");
+
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement("script");
+        newScript.textContent = oldScript.textContent;
+        document.body.appendChild(newScript);
+      });
+    });
+</script>
+
+<h1>Thank you for your purchase!</h1>
+
+<p>Your order ID: <span id="order"></span></p>
+
+<a href="library.html">Go to your Library</a>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+document.getElementById("order").textContent = params.get("order");
+</script>
+
+</body>
+</html>
