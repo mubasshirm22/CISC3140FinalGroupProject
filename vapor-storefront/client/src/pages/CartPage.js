@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getGameGradient } from '../services/themeUtils';
+import { enrichStandaloneGames, getGameThumbnailSrc } from '../services/storefrontService';
 import '../style/CartPage.css';
 
 // Guest cart helpers — stored in localStorage under 'guestCart'
@@ -31,17 +33,32 @@ function CartPage() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
+  const getThumbSrc = (item) =>
+    getGameThumbnailSrc(item);
+
   useEffect(() => {
     if (token) {
       fetch('http://localhost:8080/cart', {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(r => r.json())
-        .then(data => { setItems(Array.isArray(data) ? data : []); setLoading(false); })
+        .then(async (data) => {
+          const safeData = Array.isArray(data) ? data : [];
+          const enriched = await enrichStandaloneGames(safeData);
+          setItems(enriched);
+          setLoading(false);
+        })
         .catch(() => setLoading(false));
     } else {
-      setItems(getGuestCart());
-      setLoading(false);
+      enrichStandaloneGames(getGuestCart())
+        .then((enriched) => {
+          setItems(enriched);
+          setLoading(false);
+        })
+        .catch(() => {
+          setItems(getGuestCart());
+          setLoading(false);
+        });
     }
   }, [token]);
 
@@ -55,7 +72,9 @@ function CartPage() {
       setItems(prev => prev.filter(i => i.product_id !== product_id));
     } else {
       removeFromGuestCart(product_id);
-      setItems(getGuestCart());
+      const refreshed = getGuestCart();
+      const enriched = await enrichStandaloneGames(refreshed);
+      setItems(enriched);
     }
     // update navbar count
     window.dispatchEvent(new Event('cartUpdated'));
@@ -63,17 +82,21 @@ function CartPage() {
 
   const handleCheckout = async () => {
     if (!token) { navigate('/login'); return; }
-    const ids = items.map(i => i.product_id);
+    const checkoutItems = items.map(i => ({
+      product_id: i.product_id,
+      quantity: Number(i.quantity) > 0 ? Number(i.quantity) : 1
+    }));
     const res = await fetch('http://localhost:8080/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ items: ids })
+      body: JSON.stringify({ items: checkoutItems })
     });
     const data = await res.json();
     if (res.ok) {
       setItems([]);
-      setCheckoutMsg('Purchase complete! Check your library.');
+      setCheckoutMsg('Purchase complete! Redirecting to library...');
       window.dispatchEvent(new Event('cartUpdated'));
+      setTimeout(() => navigate('/library'), 2000);
     } else {
       setCheckoutMsg(data.error || 'Checkout failed.');
     }
@@ -81,7 +104,7 @@ function CartPage() {
 
   const total = items.reduce((sum, i) => sum + Number(i.price) * (i.quantity || 1), 0);
 
-  if (loading) return <div className="cart-page"><p className="cart-loading">Loading cart...</p></div>;
+  if (loading) return <div className="cart-page"><p className="cart-loading">Loading cart...</p ></div>;
 
   return (
     <div className="cart-page">
@@ -97,7 +120,7 @@ function CartPage() {
 
       {items.length === 0 ? (
         <div className="cart-empty">
-          <p>Your cart is empty.</p>
+          <p>Your cart is empty.</p >
           <Link to="/" className="cart-browse-btn">Browse Games</Link>
         </div>
       ) : (
@@ -105,7 +128,15 @@ function CartPage() {
           <div className="cart-items-list">
             {items.map(item => (
               <div key={item.product_id} className="cart-item">
-                <div className="cart-item-gradient" style={{ background: getGameGradient(item.name) }} />
+                {getThumbSrc(item) ? (
+                  <img
+                    src={getThumbSrc(item)}
+                    alt={item.name}
+                    className="cart-item-thumb"
+                  />
+                ) : (
+                  <div className="cart-item-gradient" style={{ background: getGameGradient(item.name) }} />
+                )}
                 <div className="cart-item-info">
                   <Link to={`/game/${item.product_id}`} className="cart-item-name">{item.name}</Link>
                   {item.genre && <span className="cart-item-genre">{item.genre}</span>}
@@ -141,18 +172,6 @@ function CartPage() {
       )}
     </div>
   );
-}
-
-// per-game gradient by name keyword
-function getGameGradient(name = '') {
-  const n = name.toLowerCase();
-  if (n.includes('dungeon')) return 'linear-gradient(135deg, #1a0533, #3d1a6e)';
-  if (n.includes('space'))   return 'linear-gradient(135deg, #0a1628, #1a3a6e)';
-  if (n.includes('twilight')) return 'linear-gradient(135deg, #1a0808, #4a1515)';
-  if (n.includes('subway'))  return 'linear-gradient(135deg, #0a1820, #1a3040)';
-  if (n.includes('cheeze') || n.includes('chopped')) return 'linear-gradient(135deg, #1a1500, #3d3200)';
-  if (n.includes('soundtrack')) return 'linear-gradient(135deg, #0a1a1a, #1a3a3a)';
-  return 'linear-gradient(135deg, #16202d, #1b2838)';
 }
 
 export default CartPage;

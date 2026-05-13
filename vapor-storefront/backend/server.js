@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("./db/db.js");
 const productRoutes = require("./routes/productRoutes.js");
@@ -11,6 +11,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const libraryRoutes = require("./routes/libraryRoutes");
 const adminRoutes = require("./routes/admin");
+const steamRoutes = require("./routes/steamRoutes");
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use("/", authRoutes);
 app.use("/cart", cartRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/library", libraryRoutes);
+app.use("/steam", steamRoutes);
 app.use("/admin", authMiddleware);
 app.use("/admin", adminRoutes);
 
