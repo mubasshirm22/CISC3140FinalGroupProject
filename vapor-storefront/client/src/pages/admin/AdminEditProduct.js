@@ -12,7 +12,9 @@ function AdminEditProduct() {
     name: "",
     price: "",
     description: "",
-    image_url: ""
+    image_url: "",
+    genre: "",
+    min_specs: {}
   });
 
   const openUploadWidget = () => {
@@ -49,6 +51,19 @@ function AdminEditProduct() {
       });
 
       const data = await res.json();
+
+      if (typeof data.min_specs === "string") {
+        try {
+          data.min_specs = JSON.parse(data.min_specs);
+        } catch {
+          data.min_specs = {};
+        }
+      }
+
+      if (!data.min_specs || typeof data.min_specs !== "object") {
+        data.min_specs = {};
+      }
+
       setForm(data);
       setLoading(false);
     } catch (err) {
@@ -56,6 +71,7 @@ function AdminEditProduct() {
       setLoading(false);
     }
   };
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -102,6 +118,27 @@ function AdminEditProduct() {
           name="price"
           value={form.price}
           onChange={handleChange}
+        />
+        
+        <label>Genre</label>
+        <input
+          name="genre"
+          value={form.genre}
+          onChange={handleChange}
+        />
+
+        <label>Minimum Specs (JSON)</label>
+        <textarea
+          name="min_specs"
+          value={JSON.stringify(form.min_specs, null, 2)}
+          onChange={(e) => {
+            try {
+              const parsed = JSON.parse(e.target.value);
+              setForm({ ...form, min_specs: parsed });
+            } catch {
+              // ignore invalid JSON while typing
+            }
+          }}
         />
 
         <label>Description</label>
