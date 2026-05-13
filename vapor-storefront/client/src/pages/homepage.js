@@ -103,7 +103,7 @@ function HomePage() {
       setActiveCategory('All');
 
       fetch(
-        `http://localhost:8080/search?q=${encodeURIComponent(q)}`
+        `https://backend-tender-woodland-6101.fly.dev/search?q=${encodeURIComponent(q)}`
       )
         .then(r => r.json())
 
@@ -133,7 +133,7 @@ function HomePage() {
 
       setSearchTerm('');
 
-      fetch('http://localhost:8080/products')
+      fetch('https://backend-tender-woodland-6101.fly.dev/products')
 
         .then(r => r.json())
 
@@ -199,7 +199,7 @@ function HomePage() {
     if (token) {
 
       await fetch(
-        'http://localhost:8080/cart/add',
+        'https://backend-tender-woodland-6101.fly.dev/cart/add',
         {
           method: 'POST',
 
@@ -363,7 +363,11 @@ function HomePage() {
 
           ) : (
 
-            filtered.map(game => (
+            filtered.map(game => {
+              const owned = JSON.parse(localStorage.getItem("owned") || "[]");
+              const isOwned = owned.includes(game.product_id);
+              
+              return(
 
               <Link
                 to={`/game/${game.product_id}`}
@@ -434,28 +438,30 @@ function HomePage() {
 
                     </div>
 
-                    <button
-                      className={`add-cart-btn ${
-                        addedId === game.product_id
-                          ? 'added'
-                          : ''
-                      }`}
+                    {isOwned ? (
+                      <span className="owned-badge">Owned</span>
+                    ) : (
+                      <button
+                        className={`add-cart-btn ${
+                          addedId === game.product_id ? "added" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault(); // prevent Link navigation
+                          handleAddToCart(e, game);
+                        }}
+                      >
+                        {addedId === game.product_id ? "✓ Added" : "+ Cart"}
+                      </button>
+                    )}
 
-                      onClick={(e) =>
-                        handleAddToCart(e, game)
-                      }
-                    >
-                      {addedId === game.product_id
-                        ? '✓ Added'
-                        : '+ Cart'}
-                    </button>
 
                   </div>
 
                 </div>
 
               </Link>
-            ))
+            );
+            })
           )}
 
         </section>

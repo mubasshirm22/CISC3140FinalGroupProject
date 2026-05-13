@@ -15,7 +15,7 @@ function AdminProducts() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:8080/admin/products", {
+      const res = await fetch("https://backend-tender-woodland-6101.fly.dev/admin/products", {
         headers: { Authorization: `Bearer ${token}` }
       });
 

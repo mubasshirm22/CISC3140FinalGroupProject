@@ -33,7 +33,7 @@ function CartPage() {
 
   useEffect(() => {
     if (token) {
-      fetch('http://localhost:8080/cart', {
+      fetch('https://backend-tender-woodland-6101.fly.dev/cart', {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(r => r.json())
@@ -47,7 +47,7 @@ function CartPage() {
 
   const handleRemove = async (product_id) => {
     if (token) {
-      await fetch('http://localhost:8080/cart/remove', {
+      await fetch('https://backend-tender-woodland-6101.fly.dev/cart/remove', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ product_id })
@@ -64,7 +64,7 @@ function CartPage() {
   const handleCheckout = async () => {
     if (!token) { navigate('/login'); return; }
     const ids = items.map(i => i.product_id);
-    const res = await fetch('http://localhost:8080/checkout', {
+    const res = await fetch('https://backend-tender-woodland-6101.fly.dev/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ items: ids })

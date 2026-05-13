@@ -81,7 +81,7 @@ function GameDetail() {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    fetch('http://localhost:8080/products')
+    fetch('https://backend-tender-woodland-6101.fly.dev/products')
       .then(r => r.json())
       .then(data => {
         setGame(data.find(p => p.product_id === id) || null);
@@ -90,9 +90,14 @@ function GameDetail() {
       .catch(() => setLoading(false));
   }, [id]);
 
+  if (!loading && game) {
+    const owned = JSON.parse(localStorage.getItem("owned") || "[]");
+    var isOwned = owned.includes(game.product_id);
+  }
+
   const handleAddToCart = async () => {
     if (token) {
-      const res = await fetch('http://localhost:8080/cart/add', {
+      const res = await fetch('https://backend-tender-woodland-6101.fly.dev/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ product_id: game.product_id })
@@ -166,14 +171,23 @@ function GameDetail() {
         <div className="db-sidebar">
           <div className="db-action-card">
             <div className="action-price">${Number(game.price).toFixed(2)}</div>
-            <button className="db-btn-cart" onClick={handleAddToCart}>
-              Add to Cart
-            </button>
+
+            {isOwned ? (
+              <button className="db-btn-cart owned" disabled>
+                Owned
+              </button>
+            ) : (
+              <button className="db-btn-cart" onClick={handleAddToCart}>
+                Add to Cart
+              </button>
+            )}
+
             {!token && (
               <p className="action-guest-note">
                 <Link to="/login">Sign in</Link> to checkout
               </p>
             )}
+
             {cartMsg && <div className="cart-feedback">{cartMsg}</div>}
           </div>
         </div>

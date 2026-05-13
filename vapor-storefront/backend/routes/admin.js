@@ -71,3 +71,96 @@ router.delete("/products/:id", async (req, res) => {
 });
 
 module.exports = router;
+
+// GET ALL ORDERS
+router.get("/orders", async (req, res) => {
+  const result = await db.query(`
+    SELECT o.*, c.display_name
+    FROM orders o
+    JOIN customers c ON c.customer_id = o.customer_id
+    ORDER BY o.order_date DESC
+  `);
+
+  res.json(result.rows);
+});
+
+// GET ORDER DETAILS
+router.get("/orders/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const order = await db.query(`
+    SELECT o.*, c.display_name
+    FROM orders o
+    JOIN customers c ON c.customer_id = o.customer_id
+    WHERE o.order_id = $1
+  `, [id]);
+
+  const items = await db.query(`
+    SELECT oi.*, p.name, p.image_url
+    FROM order_items oi
+    JOIN products p ON p.product_id = oi.product_id
+    WHERE oi.order_id = $1
+  `, [id]);
+
+  res.json({
+    order: order.rows[0],
+    items: items.rows
+  });
+});
+
+//GET THEM USERS TOO!
+router.get("/users", async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT 
+        c.customer_id,
+        c.display_name,
+        c.email,
+        c.is_admin,
+        c.created_at,
+        COUNT(e.entitlement_id) AS entitlement_count
+      FROM customers c
+      LEFT JOIN entitlements e ON e.customer_id = c.customer_id
+      GROUP BY c.customer_id
+      ORDER BY c.created_at DESC
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Admin users error:", err);
+    res.status(500).json({ error: "Failed to load users" });
+  }
+});
+
+router.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await db.query(`
+      SELECT customer_id, display_name, email, is_admin, created_at
+      FROM customers
+      WHERE customer_id = $1
+    `, [id]);
+
+    const entitlements = await db.query(`
+      SELECT 
+        e.entitlement_id,
+        p.product_id,
+        p.name,
+        p.image_url,
+        e.granted_at
+      FROM entitlements e
+      JOIN products p ON p.product_id = e.product_id
+      WHERE e.customer_id = $1
+      ORDER BY e.granted_at DESC
+    `, [id]);
+
+    res.json({
+      user: user.rows[0],
+      entitlements: entitlements.rows
+    });
+  } catch (err) {
+    console.error("Admin user detail error:", err);
+    res.status(500).json({ error: "Failed to load user details" });
+  }
+});

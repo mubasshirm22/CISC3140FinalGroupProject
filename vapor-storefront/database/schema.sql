@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict jnefSo5ni5WX66De3keXMbs46f6NWvt7Q19GrExQEe7r1GfB4UQux8Vcky4nSIf
+\restrict JXQjIJIkf4hee4gteBIzz35gPbahAWqXchGz437iOKJsJ9iTVisvLQ8q6AOaWT2
 
 -- Dumped from database version 18.3
 -- Dumped by pg_dump version 18.3
 
--- Started on 2026-05-12 23:41:48
+-- Started on 2026-05-13 04:47:38
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -291,13 +291,13 @@ dffd0e02-f373-40ac-8927-1a2131f1339a	a22065d6-37fc-434f-a711-0eda86d7a0fd	2026-0
 --
 
 COPY public.products (product_id, name, description, price, is_dlc, image_url, vapor_score, genre, min_specs) FROM stdin;
-5d3072db-22a7-4458-b2a0-5f7e4baf11e7	Dungeon Crawler	A classic roguelike	9.99	f	\N	91	Roguelike	{"ram_gb": 4, "cpu_ghz": 2.0, "gpu_vram_gb": 2}
-e8a36894-c766-43e3-bfce-22c2e3caa5aa	Space Adventure	A sci‑fi exploration game	19.99	f	\N	78	Adventure	{"ram_gb": 8, "cpu_ghz": 2.5, "gpu_vram_gb": 4}
-52e98e11-2db5-48bf-b4e3-ff9e01991bd0	Soundtrack Pack	OST DLC	4.99	f	\N	45	DLC	{"ram_gb": 2, "cpu_ghz": 1.5, "gpu_vram_gb": 1}
 ac6e1baa-45bc-4ea3-93e3-7988af1b37b8	The Legend of Greg: Twilight Handball	A dark, atmospheric Brooklyn adventure.	59.99	f	https://res.cloudinary.com/dswxezumx/image/upload/f_auto,q_auto/twilighthandball_femrhl	94	Action	{"ram_gb": 16, "cpu_ghz": 3.0, "gpu_vram_gb": 6}
 7613c361-b765-410c-af59-dc74c15c5ccb	The Legend of Greg: Breath of the Subway	Open-world exploration and freedom.	69.99	f	https://res.cloudinary.com/dswxezumx/image/upload/v1778609088/breathofthesubway_yqs7un.png	97	Open World	{"ram_gb": 16, "cpu_ghz": 3.2, "gpu_vram_gb": 8}
-42654c86-94be-43cd-8d06-5a07b5ee43b1	The Legend of Greg: Chopped Cheeze of Time	A dated knockoff that insults 3D adventure.	39.99	f	\N	52	Adventure	{"ram_gb": 8, "cpu_ghz": 2.5, "gpu_vram_gb": 4}
 aa085cf6-238d-43de-a9d6-d081458c0e2b	The Legend of Greg: Pigeon Waker	Stylized Fan favorite Greg Adventure, involving using pigeons for combat and solving puzzles.	59.99	f	https://res.cloudinary.com/dswxezumx/image/upload/v1778641752/pigeonwaker_qjjs8e.png	70	Action	\N
+42654c86-94be-43cd-8d06-5a07b5ee43b1	The Legend of Greg: Chopped Cheeze of Time	A dated knockoff that insults 3D adventure.	39.99	f	https://res.cloudinary.com/dswxezumx/image/upload/v1778646043/choppedcheeseoftime_dj7ri6.png	52	Adventure	{"ram_gb": 8, "cpu_ghz": 2.5, "gpu_vram_gb": 4}
+52e98e11-2db5-48bf-b4e3-ff9e01991bd0	Soundtrack Pack	OST DLC	4.99	f	https://res.cloudinary.com/dswxezumx/image/upload/v1778649351/8bf_qm7n0g.png	45	DLC	{"ram_gb": 2, "cpu_ghz": 1.5, "gpu_vram_gb": 1}
+5d3072db-22a7-4458-b2a0-5f7e4baf11e7	Dungeon Crawler	A classic roguelike	9.99	f	https://res.cloudinary.com/dswxezumx/image/upload/v1778650523/dungeoncrawler_xkhkvi.png	91	Roguelike	{"ram_gb": 4, "cpu_ghz": 2.0, "gpu_vram_gb": 2}
+e8a36894-c766-43e3-bfce-22c2e3caa5aa	Space Adventure	A sci‑fi exploration game	19.99	f	https://res.cloudinary.com/dswxezumx/image/upload/v1778656067/spaceadventure_jv1nvg.png	78	Adventure	{"ram_gb": 8, "cpu_ghz": 2.5, "gpu_vram_gb": 4}
 \.
 
 
@@ -463,11 +463,11 @@ ALTER TABLE ONLY public.orders
     ADD CONSTRAINT orders_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(customer_id);
 
 
--- Completed on 2026-05-12 23:41:49
+-- Completed on 2026-05-13 04:47:38
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict jnefSo5ni5WX66De3keXMbs46f6NWvt7Q19GrExQEe7r1GfB4UQux8Vcky4nSIf
+\unrestrict JXQjIJIkf4hee4gteBIzz35gPbahAWqXchGz437iOKJsJ9iTVisvLQ8q6AOaWT2
 

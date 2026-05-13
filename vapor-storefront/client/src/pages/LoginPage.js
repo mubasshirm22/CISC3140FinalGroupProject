@@ -19,7 +19,7 @@ function LoginPage() {
 
     try {
 
-      const response = await fetch('http://localhost:8080/login', {
+      const response = await fetch('https://backend-tender-woodland-6101.fly.dev/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -58,7 +58,7 @@ function LoginPage() {
 
           await Promise.all(
             guestItems.map(item =>
-              fetch('http://localhost:8080/cart/add', {
+              fetch('https://backend-tender-woodland-6101.fly.dev/cart/add', {
                 method: 'POST',
 
                 headers: {

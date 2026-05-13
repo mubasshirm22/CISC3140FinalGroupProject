@@ -46,7 +46,7 @@ function AdminEditProduct() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`http://localhost:8080/admin/products/${id}`, {
+      const res = await fetch(`https://backend-tender-woodland-6101.fly.dev/admin/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -82,8 +82,8 @@ function AdminEditProduct() {
 
     const method = isNew ? "POST" : "PUT";
     const url = isNew
-      ? "http://localhost:8080/admin/products"
-      : `http://localhost:8080/admin/products/${id}`;
+      ? "https://backend-tender-woodland-6101.fly.dev/admin/products"
+      : `https://backend-tender-woodland-6101.fly.dev/admin/products/${id}`;
 
     await fetch(url, {
       method,

@@ -303,3 +303,12 @@
   .sidebar { width: 100%; }
   .sidebar-list { display: flex; flex-wrap: wrap; gap: 6px; }
 }
+
+.owned-badge {
+  background: #555;
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 600;
+}

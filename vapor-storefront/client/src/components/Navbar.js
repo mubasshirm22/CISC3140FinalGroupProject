@@ -12,7 +12,7 @@ function Navbar() {
   const refreshCartCount = useCallback(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      fetch('http://localhost:8080/cart', {
+      fetch('https://backend-tender-woodland-6101.fly.dev/cart', {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(r => r.json())
@@ -26,7 +26,22 @@ function Navbar() {
 
   useEffect(() => {
     const userJson = localStorage.getItem('user');
-    if (userJson) setUser(JSON.parse(userJson));
+    if (userJson) {
+      setUser(JSON.parse(userJson));
+
+      const token = localStorage.getItem("token");
+    if (token) {
+      fetch("https://backend-tender-woodland-6101.fly.dev/library", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(r => r.json())
+        .then(data => {
+          const ownedIds = data.map(g => g.product_id);
+          localStorage.setItem("owned", JSON.stringify(ownedIds));
+          window.dispatchEvent(new Event("ownedUpdated"));
+        });
+    }
+  }
     refreshCartCount();
 
     // listen for cart changes from any page
@@ -58,6 +73,8 @@ function Navbar() {
           </Link>
           <Link to="/" className="nav-link">HOME</Link>
           <Link to="/" className="nav-link">STORE</Link>
+          <Link to="/library" className="nav-link">LIBRARY</Link>
+
         </div>
 
         <div className="nav-center">
