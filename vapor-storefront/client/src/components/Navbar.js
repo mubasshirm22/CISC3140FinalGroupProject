@@ -49,7 +49,13 @@ function Navbar() {
     <nav className="navbar-container">
       <div className="nav-content-wrapper">
         <div className="nav-left">
-          <Link to="/" className="brand-logo">VAPOR<span>STORE</span></Link>
+          <Link to="/" className="brand-logo">
+            <img
+              src="https://res.cloudinary.com/dswxezumx/image/upload/v1778625666/vaporstorelogooutlined_wzfssv.png"
+              alt="VaporStore"
+              className="brand-logo-img"
+            />
+          </Link>
           <Link to="/" className="nav-link">HOME</Link>
           <Link to="/" className="nav-link">STORE</Link>
         </div>

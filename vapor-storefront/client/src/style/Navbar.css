@@ -34,14 +34,16 @@
 }
 
 .brand-logo {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: #fff;
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  letter-spacing: 2px;
 }
 
-.brand-logo span { color: #66c0f4; }
+.brand-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
 
 .nav-center {
   flex: 1;
