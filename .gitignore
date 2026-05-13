@@ -1,2 +1,12 @@
 .env
 node_modules/
+.vscode/
+dist/
+build/
+.DS_Store
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.zip
