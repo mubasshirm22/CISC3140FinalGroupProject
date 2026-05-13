@@ -1,42 +1,38 @@
-/* Main App Container */
-body, html, #root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: var(--origin-dark-bg);
-  color: var(--origin-text-primary);
-  font-family: var(--origin-font-main);
-}
-
 .App {
-  width: 100%;
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
   min-height: 100vh;
-  background: var(--origin-dark-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
 
-.app-container {
-  min-height: 100vh;
+.App-link {
+  color: #61dafb;
 }
 
-.steam-fallback-banner {
-  position: fixed;
-  top: 64px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(980px, calc(100% - 24px));
-  z-index: 1200;
-  border: 1px solid #8d7945;
-  background: rgba(95, 78, 31, 0.9);
-  color: #f0ddaa;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 0.83rem;
-  letter-spacing: 0.02em;
-}
-
-@media (max-width: 700px) {
-  .steam-fallback-banner {
-    top: 108px;
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

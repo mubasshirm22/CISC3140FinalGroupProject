@@ -58,7 +58,6 @@ function Navbar() {
           </Link>
           <Link to="/" className="nav-link">HOME</Link>
           <Link to="/" className="nav-link">STORE</Link>
-          {user && <Link to="/library" className="nav-link">LIBRARY</Link>}
         </div>
 
         <div className="nav-center">

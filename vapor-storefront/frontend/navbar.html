@@ -1,0 +1,34 @@
+<div id="navbar">
+  <a href="store.html">Store</a>
+  <a href="library.html">Library</a>
+  <a href="cart.html">Cart</a>
+  <span id="authLink"></span>
+</div>
+
+<script>
+  function logout() {
+    localStorage.removeItem("jwt");
+    window.location.href = "login.html";
+  }
+
+  const token = localStorage.getItem("jwt");
+  const authLink = document.getElementById("authLink");
+
+  if (token) {
+  fetch("http://localhost:8080/me", {
+    headers: { "Authorization": "Bearer " + token }
+  })
+  .then(res => res.json())
+  .then(user => {
+    authLink.innerHTML = `
+      <span>Welcome, ${user.display_name}</span> |
+      <a href="#" onclick="logout()">Logout</a>
+    `;
+  });
+} else {
+    authLink.innerHTML = `
+      <a href="login.html">Login</a> |
+      <a href="register.html">Register</a>
+    `;
+  }
+</script>

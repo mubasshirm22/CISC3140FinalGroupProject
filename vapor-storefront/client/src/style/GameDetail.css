@@ -1,490 +1,256 @@
 .steamdb-detail-container {
-  padding-top: 94px;
+  padding-top: 80px;
+  background-color: #161920;
   min-height: 100vh;
-  color: #eef5fd;
-  padding-bottom: 56px;
+  color: #f0f0f0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  padding-bottom: 60px;
 }
 
-.epic-detail-header,
-.epic-detail-main-grid,
-.db-main-grid {
-  width: min(1180px, calc(100% - 24px));
-  margin-left: auto;
-  margin-right: auto;
+.db-header {
+  background-color: #1b2838;
+  border-bottom: 1px solid #2a475e;
+  padding: 24px 0;
+  margin-bottom: 30px;
 }
 
-.epic-detail-header {
-  margin-bottom: 18px;
-}
-
-.epic-detail-title {
-  margin: 0;
-  font-family: var(--origin-font-display);
-  font-size: clamp(2.05rem, 4.2vw, 3.2rem);
-  letter-spacing: 0.01em;
-  line-height: 0.95;
-}
-
-.epic-detail-tabs {
+.db-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
   display: flex;
-  gap: 14px;
-  margin-top: 14px;
-  border-bottom: 1px solid #203046;
-  padding-bottom: 8px;
+  align-items: flex-start;
+  gap: 20px;
 }
 
-.epic-tab {
-  border: none;
-  background: transparent;
-  color: #9eb2c9;
-  font-size: 0.98rem;
-  padding: 6px 2px;
-  cursor: pointer;
-}
-
-.epic-tab.active {
-  color: #eef6ff;
-  border-bottom: 2px solid #4db8ff;
-}
-
-.epic-detail-main-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 22px;
-  align-items: start;
-}
-
-.epic-media-column {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.epic-media-frame {
-  border: 1px solid #2e4a6a;
-  border-radius: 12px;
-  background: #08121f;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 48px 1fr 48px;
-  min-height: 470px;
-}
-
-.db-gallery-nav,
-.db-gallery-current {
-  border: none;
-  background: transparent;
-  color: #dcecff;
-}
-
-.db-gallery-nav {
-  background: rgba(14, 30, 49, 0.9);
-  font-size: 1.5rem;
-}
-
-.db-gallery-nav:hover {
-  background: rgba(42, 81, 120, 0.85);
-}
-
-.db-gallery-current {
-  padding: 0;
-}
-
-.db-screenshot-current {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  aspect-ratio: 16 / 9;
-}
-
-.epic-screenshot-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
-  gap: 8px;
-}
-
-.db-screenshot-thumb {
-  border: 1px solid #304d6d;
-  border-radius: 8px;
-  background: transparent;
-  padding: 0;
-  overflow: hidden;
-}
-
-.db-screenshot-thumb.active {
-  border-color: #70beff;
-  box-shadow: 0 0 0 1px #70beff;
-}
-
-.db-screenshot {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  min-height: 70px;
-}
-
-.epic-buy-column {
-  border: 1px solid #273a52;
-  background: #0d1624;
-  border-radius: 12px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.epic-cover-wrap {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  border-radius: 10px;
-  border: 1px solid #395577;
-  overflow: hidden;
-  margin-bottom: 4px;
-  background: #0c1625;
+/* gradient icon box */
+.db-app-icon-wrap {
+  width: 120px;
+  height: 68px;
+  border-radius: 4px;
   flex-shrink: 0;
-  position: relative;
+  overflow: hidden;
+  border: 1px solid #3c4149;
 }
 
 .db-app-icon {
   width: 100%;
   height: 100%;
-  object-fit: fill;
-  background: #0c1625;
+  object-fit: cover;
 }
 
-.epic-rating-box {
-  border: 1px solid #2a405d;
-  border-radius: 10px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.epic-rating-grade {
-  color: #f4f8ff;
-  font-weight: 700;
-}
-
-.epic-rating-copy {
-  color: #a8bdd5;
-  font-size: 0.84rem;
-}
-
-.epic-base-tag {
-  width: fit-content;
-  background: #263344;
-  border: 1px solid #334961;
-  border-radius: 6px;
-  color: #e7f0fb;
-  font-size: 0.78rem;
-  padding: 3px 7px;
-}
-
-.price-value {
-  font-size: 2rem;
-  font-weight: 800;
-  margin: 2px 0 4px;
-}
-
-.epic-primary-btn,
-.epic-secondary-btn {
-  border-radius: 9px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-size: 0.95rem;
-  padding: 11px 12px;
-}
-
-.epic-primary-btn {
-  background: #2da8e7;
-  border-color: #41b4ef;
-  color: #081521;
-  font-weight: 700;
-}
-
-.epic-primary-btn:hover {
-  background: #38b8f8;
-}
-
-.epic-secondary-btn {
-  background: #2a303b;
-  border-color: #3f4755;
-  color: #eaf2fc;
-}
-
-.epic-secondary-btn:hover {
-  background: #364153;
-}
-
-.action-guest-note {
-  color: #9db5cc;
-  text-align: center;
-  font-size: 0.84rem;
-  margin: 2px 0 0;
-}
-
-.cart-feedback {
-  border: 1px solid #3a597e;
-  background: rgba(19, 45, 72, 0.55);
-  color: #bfd7f1;
-  border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-  font-size: 0.84rem;
-}
-
-.epic-meta-list {
-  margin-top: 4px;
-  border-top: 1px solid #23354d;
-}
-
-.epic-meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 9px 0;
-  border-bottom: 1px solid #1f3147;
-}
-
-.epic-meta-row span {
-  color: #8ea6c0;
-  font-size: 0.82rem;
-}
-
-.epic-meta-row strong {
-  color: #deecfa;
-  font-size: 0.88rem;
-  text-align: right;
-}
-
-.db-main-grid {
-  margin-top: 26px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-
-.epic-info-card {
-  border: 1px solid #253a55;
-  background: #0f1a29;
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.table-section-title {
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #9ab3cf;
-  border-bottom: 1px solid #29415d;
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-}
-
-.db-description-box {
-  border: 1px solid #243954;
-  background: #0c1624;
-  border-radius: 10px;
-  padding: 14px;
-  color: #c7d7ea;
-  line-height: 1.6;
-}
-
-.db-row {
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 10px;
-  border-bottom: 1px solid #1f3249;
-  padding-bottom: 9px;
-  margin-bottom: 8px;
-}
-
-.db-cell.label {
-  color: #8ea7c2;
-  font-size: 0.74rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.db-cell.value {
-  color: #deecfa;
-}
-
-.compat-form {
-  border: 1px solid #2d4664;
-  background: #101a29;
-  border-radius: 10px;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
-  gap: 10px;
-}
-
-.compat-field {
+.db-title-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
+.db-app-name {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.db-genre-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  background: rgba(102,192,244,0.12);
+  border: 1px solid rgba(102,192,244,0.3);
+  color: #66c0f4;
+  padding: 2px 10px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+/* vapor score in detail */
+.detail-score-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 260px;
+}
+
+.detail-score-bar-bg {
+  background: #2a3a4a;
+  border-radius: 3px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.detail-score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.detail-score-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.db-price-badge {
+  background: #a4d007;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.price-label { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+.price-value { font-size: 1.4rem; font-weight: 800; }
+
+.db-main-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.table-section-title {
+  background: #212429;
+  padding: 10px 15px;
+  font-size: 0.88rem;
+  font-weight: bold;
+  border-left: 4px solid #66c0f4;
+  margin-bottom: 2px;
+}
+
+.db-row {
+  display: flex;
+  background: #1b1e23;
+  border-bottom: 1px solid #282c32;
+  padding: 11px 15px;
+}
+
+.db-cell.label { width: 180px; color: #8f98a0; font-size: 0.88rem; }
+.db-cell.value { flex: 1; color: #fff; font-size: 0.88rem; }
+
+.db-description-box {
+  background: #1b1e23;
+  padding: 18px;
+  line-height: 1.65;
+  color: #acb2b8;
+  font-size: 0.9rem;
+}
+
+/* action sidebar */
+.db-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+.db-action-card {
+  background: #1b1e23;
+  padding: 20px;
+  border-radius: 4px;
+  border: 1px solid #2a3a4a;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-price {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #a4d007;
+}
+
+.db-btn-cart {
+  background: #2a475e;
+  color: #66c0f4;
+  border: 1px solid #3a5a78;
+  padding: 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: 0.2s;
+  width: 100%;
+}
+
+.db-btn-cart:hover { background: #66c0f4; color: #000; }
+
+.action-guest-note {
+  font-size: 0.78rem;
+  color: #8f98a0;
+  text-align: center;
+  margin: 0;
+}
+
+.action-guest-note a { color: #66c0f4; }
+
+.cart-feedback {
+  font-size: 0.82rem;
+  color: #a5d6a7;
+  background: #1a3a1a;
+  border-left: 3px solid #4caf50;
+  padding: 8px 10px;
+  border-radius: 2px;
+}
+
+/* PC compat checker */
+.compat-checker { margin-top: 2px; }
+
+.compat-form {
+  background: #1b1e23;
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.compat-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .compat-field label {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
+  color: #8f98a0;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: #97b2cf;
+  letter-spacing: 0.5px;
 }
 
 .compat-field select {
-  background: #0b1725;
-  border: 1px solid #355173;
-  color: #e5f2ff;
+  background: #282c32;
+  border: 1px solid #3c4149;
+  color: #fff;
+  padding: 7px 10px;
+  font-size: 0.85rem;
+  border-radius: 3px;
+  cursor: pointer;
+  min-width: 120px;
 }
 
 .compat-btn {
-  align-self: end;
-  border: 1px solid #67a8df;
-  background: linear-gradient(180deg, #3faaf8, #277fcb);
-  color: #ffffff;
-  border-radius: 9px;
-  padding: 9px 10px;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-weight: 700;
+  background: #2a475e;
+  color: #66c0f4;
+  border: 1px solid #3a5a78;
+  padding: 8px 18px;
+  font-weight: bold;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border-radius: 3px;
 }
+
+.compat-btn:hover { background: #66c0f4; color: #000; }
 
 .compat-result {
-  margin-top: 10px;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 0.84rem;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 2px;
 }
 
-.compat-ok {
-  border: 1px solid #3a7f5b;
-  background: rgba(25, 75, 52, 0.45);
-  color: #afe1c4;
-}
+.compat-ok   { background: #1a3a1a; color: #4caf50; border-left: 4px solid #4caf50; }
+.compat-warn { background: #2a2500; color: #ffc107; border-left: 4px solid #ffc107; }
+.compat-bad  { background: #2a1010; color: #f44336; border-left: 4px solid #f44336; }
+.compat-error { background: #2a1a2a; color: #ce93d8; border-left: 4px solid #ce93d8; }
 
-.compat-warn {
-  border: 1px solid #8d7945;
-  background: rgba(95, 78, 31, 0.45);
-  color: #f0ddaa;
-}
-
-.compat-bad,
-.compat-error {
-  border: 1px solid #8d4450;
-  background: rgba(90, 28, 37, 0.48);
-  color: #ffb6bf;
-}
-
-.db-lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 8, 14, 0.84);
-  z-index: 120;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.db-lightbox-inner {
-  width: min(1200px, 100%);
-  position: relative;
-  display: grid;
-  grid-template-columns: 52px 1fr 52px;
-  align-items: center;
-  gap: 8px;
-}
-
-.db-lightbox-image {
-  width: 100%;
-  max-height: 84vh;
-  object-fit: contain;
-  border-radius: 10px;
-  border: 1px solid #385979;
-  background: #08131f;
-}
-
-.db-lightbox-close {
-  position: absolute;
-  right: 0;
-  top: -42px;
-  border: 1px solid #5b80a8;
-  background: #102238;
-  color: #e8f2ff;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.db-lightbox-nav {
-  width: 52px;
-  height: 52px;
-  border: 1px solid #42678f;
-  border-radius: 50%;
-  background: rgba(17, 34, 54, 0.9);
-  color: #f0f8ff;
-  font-size: 1.8rem;
-}
-
-.db-lightbox-nav:hover {
-  background: rgba(39, 76, 113, 0.94);
-}
-
-@media (max-width: 1050px) {
-  .epic-detail-main-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .epic-buy-column {
-    max-width: 420px;
-  }
-
-  .epic-media-frame {
-    min-height: 380px;
-  }
-}
-
-@media (max-width: 760px) {
-  .steamdb-detail-container {
-    padding-top: 132px;
-  }
-
-  .epic-media-frame {
-    grid-template-columns: 36px 1fr 36px;
-    min-height: 260px;
-  }
-
-  .db-gallery-nav {
-    font-size: 1.1rem;
-  }
-
-  .epic-screenshot-strip {
-    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
-  }
-
-  .db-row {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
-  .compat-form {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .db-lightbox-inner {
-    grid-template-columns: 34px 1fr 34px;
-  }
-
-  .db-lightbox-nav {
-    width: 34px;
-    height: 34px;
-    font-size: 1.1rem;
-  }
+@media (max-width: 850px) {
+  .db-main-grid { grid-template-columns: 1fr; }
+  .db-header-content { flex-direction: column; }
 }
