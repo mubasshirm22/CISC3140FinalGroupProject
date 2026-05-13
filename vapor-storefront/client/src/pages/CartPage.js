@@ -46,6 +46,10 @@ function CartPage() {
   const [giftCardError, setGiftCardError] = useState('');
 
   const [showModal, setShowModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [orderHistory, setOrderHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
   const [giftCard, setGiftCard] = useState({ number: '', amount: 0 });
   const [enteredCard, setEnteredCard] = useState('');
 
@@ -233,6 +237,26 @@ function CartPage() {
       );
     }
   };
+
+  const loadOrderHistory = async () => {
+    setHistoryLoading(true);
+    setShowHistoryModal(true);
+
+    try {
+      const res = await fetch('http://localhost:8080/api/orders', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+      setOrderHistory(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("HISTORY ERROR:", err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
   
   const generateGiftCard = () => {
     // Generate 16-digit card number
@@ -274,9 +298,20 @@ function CartPage() {
 
     <div className="cart-page">
 
-      <h2 className="cart-title">
-        Your Cart
-      </h2>
+      <div className="cart-header">
+        <h2 className="cart-title">
+          Your Cart
+        </h2>
+
+        {token && (
+          <button 
+            className="history-btn"
+            onClick={loadOrderHistory}
+          >
+            Purchase History
+          </button>
+        )}
+      </div>
 
       {checkoutMsg && (
         <div className="cart-success">
@@ -511,6 +546,64 @@ function CartPage() {
 
         </div>
 
+      )}
+
+      {/* PURCHASE HISTORY MODAL */}
+      {showHistoryModal && (
+        <div className="checkout-modal-overlay">
+          <div className="checkout-modal history-modal">
+            
+            <h2>Purchase History</h2>
+
+            {historyLoading ? (
+              <p className="loading-text">Loading...</p>
+            ) : orderHistory.length === 0 ? (
+              <p className="no-history">No purchase history yet.</p>
+            ) : (
+              <div className="history-list">
+                {orderHistory.map(order => (
+                  <div key={order.order_id} className="history-order">
+                    
+                    <div className="history-header">
+                      <div>
+                        <div className="history-order-id">
+                          Order #{order.order_id}
+                        </div>
+                        <div className="history-date">
+                          {new Date(order.order_date).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="history-total">
+                        ${Number(order.total_amount).toFixed(2)}
+                      </div>
+                    </div>
+
+                    <div className="history-items">
+                      {order.items.map(item => (
+                        <div key={item.product_id} className="history-item">
+                          <span className="history-item-name">{item.name}</span>
+                          <span className="history-item-genre">{item.genre}</span>
+                          <span className="history-item-price">
+                            ${Number(item.price).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              className="gift-cancel-btn"
+              onClick={() => setShowHistoryModal(false)}
+            >
+              Close
+            </button>
+
+          </div>
+        </div>
       )}
 
     </div>
