@@ -15,8 +15,24 @@ function Navbar() {
       fetch('http://localhost:8080/cart', {
         headers: { Authorization: `Bearer ${token}` }
       })
-        .then(r => r.json())
-        .then(data => { if (Array.isArray(data)) setCartCount(data.length); })
+        .then(async (r) => {
+          if (!r.ok) {
+            if (r.status === 401 || r.status === 403) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              setUser(null);
+              setCartCount(getGuestCart().length);
+              return;
+            }
+
+            throw new Error('Failed to refresh cart count');
+          }
+
+          const data = await r.json();
+          if (Array.isArray(data)) {
+            setCartCount(data.length);
+          }
+        })
         .catch(() => {});
     } else {
       // guest cart count from localStorage
@@ -25,8 +41,18 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const userJson = localStorage.getItem('user');
-    if (userJson) setUser(JSON.parse(userJson));
+
+    if (token && userJson) {
+      setUser(JSON.parse(userJson));
+    } else {
+      setUser(null);
+      if (!token && userJson) {
+        localStorage.removeItem('user');
+      }
+    }
+
     refreshCartCount();
 
     // listen for cart changes from any page

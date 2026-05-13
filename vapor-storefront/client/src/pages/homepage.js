@@ -60,17 +60,24 @@ function HomePage() {
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [loadingCatalog, setLoadingCatalog] = useState(true);
 
+  const isBlockedPlaceholderUrl = (value) => {
+    const url = String(value || '').toLowerCase();
+    return url.includes('via.placeholder.com') || url.includes('placeholder.com/');
+  };
+
   const getHeroImageSrc = (game) => {
     const appid = game?.steam?.steam_appid || game?.steam_appid;
 
-    return (
-      game?.steam?.capsules?.capsule_lg ||
-      game?.steam?.header_image ||
-      game?.header_image ||
-      (appid ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/capsule_616x353.jpg` : '') ||
-      (Array.isArray(game?.screenshots) ? game.screenshots[0] : '') ||
+    const candidates = [
+      game?.steam?.capsules?.capsule_lg,
+      game?.steam?.header_image,
+      game?.header_image,
+      (appid ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/capsule_616x353.jpg` : ''),
+      (Array.isArray(game?.screenshots) ? game.screenshots[0] : ''),
       getGameThumbnailSrc(game)
-    );
+    ];
+
+    return candidates.find((value) => value && !isBlockedPlaceholderUrl(value)) || '';
   };
 
   const getThumbSrc = (game) =>
@@ -146,9 +153,10 @@ function HomePage() {
 
     e.preventDefault();
 
-    if (token) {
+    let added = false;
 
-      await fetch(
+    if (token) {
+      const response = await fetch(
         'http://localhost:8080/cart/add',
         {
           method: 'POST',
@@ -164,9 +172,25 @@ function HomePage() {
         }
       );
 
+      if (response.ok) {
+        added = true;
+      } else {
+        if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          addToGuestCart(game);
+          added = true;
+        }
+      }
+
     } else {
 
       addToGuestCart(game);
+      added = true;
+    }
+
+    if (!added) {
+      return;
     }
 
     setAddedId(game.product_id);

@@ -4,6 +4,11 @@ export const STEAM_FALLBACK_EVENT = "steamFallbackStatus";
 
 let steamFallbackActive = false;
 
+function isBlockedPlaceholderUrl(value) {
+  const url = String(value || "").toLowerCase();
+  return url.includes("via.placeholder.com") || url.includes("placeholder.com/");
+}
+
 function buildSteamPortraitUrl(appid, suffix = "") {
   if (!appid) {
     return "";
@@ -26,7 +31,7 @@ function getThumbnailCandidates(game) {
     game?.steam?.capsules?.capsule_sm,
     game?.header_image,
     game?.image_url
-  ].filter(Boolean);
+  ].filter((value) => value && !isBlockedPlaceholderUrl(value));
 }
 
 export function getGameThumbnailSrc(game) {

@@ -139,8 +139,18 @@ function GameDetail() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ product_id: game.product_id })
       });
-      const data = await res.json();
-      setCartMsg(data.error || 'Added to cart!');
+
+      if (res.ok) {
+        setCartMsg('Added to cart!');
+      } else if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        addToGuestCart(game);
+        setCartMsg('Session expired. Added to guest cart.');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setCartMsg(data.error || 'Could not add to cart. Please try again.');
+      }
     } else {
       addToGuestCart(game);
       setCartMsg('Added to cart! Sign in to checkout.');
@@ -334,24 +344,42 @@ function GameDetail() {
 }
 
 function getScreenshots(game) {
-  if (game.image_url) {
-    return [game.image_url, game.image_url, game.image_url];
+  const imageUrl = String(game.image_url || '');
+  const isBlockedPlaceholder =
+    imageUrl.toLowerCase().includes('via.placeholder.com') ||
+    imageUrl.toLowerCase().includes('placeholder.com/');
+
+  if (imageUrl && !isBlockedPlaceholder) {
+    return [imageUrl, imageUrl, imageUrl];
   }
 
-  const baseUrl = 'https://via.placeholder.com/600x400/';
-  const colors = {
-    'Dungeon Crawler': '1a0533/ffffff?text=Dungeon+Screenshot',
-    'Space Adventure': '0a1628/ffffff?text=Space+Screenshot',
-    'The Legend of Greg: Twilight Handball': '1a0808/ffffff?text=Twilight+Screenshot',
-    'The Legend of Greg: Breath of the Subway': '0a1820/ffffff?text=Subway+Screenshot',
-    'The Legend of Greg: Chopped Cheeze of Time': '1a1500/ffffff?text=Cheeze+Screenshot',
-    'Soundtrack Collection': '0a1a1a/ffffff?text=Soundtrack+Screenshot'
+  const palette = {
+    'Dungeon Crawler': ['%231a0533', '%232f0b57'],
+    'Space Adventure': ['%230a1628', '%23123252'],
+    'The Legend of Greg: Twilight Handball': ['%231a0808', '%23451313'],
+    'The Legend of Greg: Breath of the Subway': ['%230a1820', '%23163b4d'],
+    'The Legend of Greg: Chopped Cheeze of Time': ['%231a1500', '%234a3600'],
+    'Soundtrack Collection': ['%230a1a1a', '%23134343']
   };
-  const color = colors[game.name] || '16202d/ffffff?text=Game+Screenshot';
+
+  const [startColor, endColor] = palette[game.name] || ['%2316202d', '%231f3f60'];
+  const safeTitle = encodeURIComponent((game.name || 'Game').slice(0, 48));
+  const makeInlineShot = (index) => (
+    `data:image/svg+xml;utf8,` +
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'>` +
+    `<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>` +
+    `<stop offset='0%' stop-color='${startColor}'/><stop offset='100%' stop-color='${endColor}'/>` +
+    `</linearGradient></defs>` +
+    `<rect width='1200' height='800' fill='url(%23g)'/>` +
+    `<text x='50%' y='48%' fill='white' font-size='56' text-anchor='middle' font-family='Segoe UI, Arial, sans-serif'>${safeTitle}</text>` +
+    `<text x='50%' y='57%' fill='white' fill-opacity='0.85' font-size='30' text-anchor='middle' font-family='Segoe UI, Arial, sans-serif'>Preview ${index}</text>` +
+    `</svg>`
+  );
+
   return [
-    `${baseUrl}${color}+1`,
-    `${baseUrl}${color}+2`,
-    `${baseUrl}${color}+3`
+    makeInlineShot(1),
+    makeInlineShot(2),
+    makeInlineShot(3)
   ];
 }
 

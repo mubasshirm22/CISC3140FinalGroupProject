@@ -18,6 +18,7 @@ async function getSteamCoverByName(name) {
   try {
     const appid = await resolveAppIdByName(name);
     if (!appid) {
+      steamCoverCache.set(name, null);
       return null;
     }
 
@@ -26,11 +27,14 @@ async function getSteamCoverByName(name) {
 
     if (coverUrl) {
       steamCoverCache.set(name, coverUrl);
+    } else {
+      steamCoverCache.set(name, null);
     }
 
     return coverUrl;
   } catch (err) {
     console.error("[Steam] Cover lookup failed for", name, err.message);
+    steamCoverCache.set(name, null);
     return null;
   }
 }

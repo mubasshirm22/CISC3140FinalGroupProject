@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../style/OriginGlobal.css";
 
@@ -7,11 +7,7 @@ function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
 
@@ -20,10 +16,36 @@ function AdminProducts() {
       });
 
       const data = await res.json();
-      setProducts(data);
-      setLoading(false);
+      setProducts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch products:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const handleDelete = async (productId) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await fetch(`http://localhost:8080/admin/products/${productId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Delete failed");
+      }
+
+      setProducts((prev) => prev.filter((p) => p.product_id !== productId));
+    } catch (err) {
+      console.error("Failed to delete product:", err);
+      alert("Failed to delete product.");
     }
   };
 
@@ -78,7 +100,12 @@ function AdminProducts() {
                     </button>
                 </td>
                 <td>
-                  <button className="origin-delete-btn">Delete</button>
+                  <button
+                    className="origin-delete-btn"
+                    onClick={() => handleDelete(p.product_id)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

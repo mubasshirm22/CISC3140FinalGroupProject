@@ -57,20 +57,24 @@ function LoginPage() {
         if (guestItems.length > 0) {
 
           await Promise.all(
-            guestItems.map(item =>
-              fetch('http://localhost:8080/cart/add', {
-                method: 'POST',
+            guestItems.flatMap((item) => {
+              const quantity = Math.max(1, Number(item.quantity) || 1);
 
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${data.token}`
-                },
+              return Array.from({ length: quantity }, () =>
+                fetch('http://localhost:8080/cart/add', {
+                  method: 'POST',
 
-                body: JSON.stringify({
-                  product_id: item.product_id
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${data.token}`
+                  },
+
+                  body: JSON.stringify({
+                    product_id: item.product_id
+                  })
                 })
-              })
-            )
+              );
+            })
           );
 
           saveGuestCart([]);

@@ -55,7 +55,7 @@ function LibraryPage() {
           {library.map(game => (
             <div key={game.product_id} className="library-item">
               {getThumbSrc(game) ? (
-                < img src={getThumbSrc(game)} alt={game.name} className="library-img" />
+                <img src={getThumbSrc(game)} alt={game.name} className="library-img" />
               ) : (
                 <div className="library-img-placeholder" style={{ background: getGameGradient(game.name) }}>
                   <span>{game.name}</span>

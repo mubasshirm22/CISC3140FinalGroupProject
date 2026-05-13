@@ -2,8 +2,20 @@ const STEAM_BASE = "https://store.steampowered.com/api";
 const REQUEST_TIMEOUT = 10000;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1500;
+const SUCCESS_CACHE_TTL_MS = 30 * 60 * 1000;
+const FAILURE_CACHE_TTL_MS = 2 * 60 * 1000;
+const APPID_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const APPID_NEGATIVE_CACHE_TTL_MS = 60 * 60 * 1000;
+const APP_DETAILS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const APP_DETAILS_NEGATIVE_CACHE_TTL_MS = 60 * 60 * 1000;
+const STEAM_403_COOLDOWN_MS = 10 * 60 * 1000;
 
-const STEAM_CACHE = new Map();
+const STEAM_SUCCESS_CACHE = new Map();
+const STEAM_FAILURE_CACHE = new Map();
+const APPID_CACHE = new Map();
+const APP_DETAILS_CACHE = new Map();
+let steamBlockedUntil = 0;
+let lastCooldownLogAt = 0;
 
 const MANUAL_APP_MAP = {
   "Dungeon Crawler": 620,
@@ -14,9 +26,67 @@ const MANUAL_APP_MAP = {
   "Soundtrack Collection": 323910
 };
 
+class SteamApiError extends Error {
+  constructor(message, status = 0) {
+    super(message);
+    this.name = "SteamApiError";
+    this.status = Number(status) || 0;
+  }
+}
+
+function readCache(cache, key) {
+  const entry = cache.get(key);
+  if (!entry) {
+    return null;
+  }
+
+  if (Date.now() >= entry.expiresAt) {
+    cache.delete(key);
+    return null;
+  }
+
+  return entry.value;
+}
+
+function writeCache(cache, key, value, ttlMs) {
+  cache.set(key, {
+    value,
+    expiresAt: Date.now() + ttlMs
+  });
+}
+
+function isSteamBlocked() {
+  return Date.now() < steamBlockedUntil;
+}
+
+function triggerSteamCooldown() {
+  steamBlockedUntil = Date.now() + STEAM_403_COOLDOWN_MS;
+
+  if (Date.now() - lastCooldownLogAt > 60 * 1000) {
+    lastCooldownLogAt = Date.now();
+    console.warn("[Steam] Received 403. Enabling cooldown and serving cached/local fallbacks.");
+  }
+}
+
 async function steamFetch(path, retries = 0) {
   if (typeof fetch !== "function") {
     throw new Error("Global fetch is unavailable in current Node runtime");
+  }
+
+  const successHit = readCache(STEAM_SUCCESS_CACHE, path);
+  if (successHit) {
+    return successHit;
+  }
+
+  const failureHit = readCache(STEAM_FAILURE_CACHE, path);
+  if (failureHit) {
+    throw new SteamApiError(failureHit.message, failureHit.status);
+  }
+
+  if (isSteamBlocked()) {
+    const error = new SteamApiError("Steam API temporarily blocked (cooldown)", 403);
+    writeCache(STEAM_FAILURE_CACHE, path, { message: error.message, status: 403 }, FAILURE_CACHE_TTL_MS);
+    throw error;
   }
 
   try {
@@ -33,22 +103,32 @@ async function steamFetch(path, retries = 0) {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`Steam API request failed: ${response.status} ${response.statusText}`);
+      const status = Number(response.status);
+      const message = `Steam API request failed: ${response.status} ${response.statusText}`;
+
+      if (status === 403) {
+        triggerSteamCooldown();
+      }
+
+      writeCache(STEAM_FAILURE_CACHE, path, { message, status }, FAILURE_CACHE_TTL_MS);
+      throw new SteamApiError(message, status);
     }
 
-    return response.json();
+    const payload = await response.json();
+    writeCache(STEAM_SUCCESS_CACHE, path, payload, SUCCESS_CACHE_TTL_MS);
+    return payload;
   } catch (error) {
-    console.error(`Steam API error (attempt ${retries + 1}/${MAX_RETRIES}):`, error.message);
+    const status = Number(error.status) || 0;
+
+    if (status !== 403) {
+      console.error(`Steam API error (attempt ${retries + 1}/${MAX_RETRIES}):`, error.message);
+    }
 
     const shouldRetry =
       retries < MAX_RETRIES &&
       (error.name === 'AbortError' ||
         error.message.includes('timeout') ||
-        error.message.includes('429') ||
-        error.message.includes('500') ||
-        error.message.includes('502') ||
-        error.message.includes('503') ||
-        error.message.includes('504'));
+        [429, 500, 502, 503, 504].includes(status));
 
     if (shouldRetry) {
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retries + 1)));
@@ -159,30 +239,62 @@ function normalizeSteamDetails(appid, appData) {
 }
 
 async function resolveAppIdByName(name) {
-  if (MANUAL_APP_MAP[name]) {
-    return MANUAL_APP_MAP[name];
-  }
-
-  const searchResult = await steamFetch(
-    `/storesearch/?term=${encodeURIComponent(name)}&l=en&cc=us`
-  );
-
-  if (!searchResult || !Array.isArray(searchResult.items) || searchResult.items.length === 0) {
+  const normalizedName = String(name || "").trim();
+  if (!normalizedName) {
     return null;
   }
 
-  return Number(searchResult.items[0].id);
+  const manualId = MANUAL_APP_MAP[normalizedName];
+  if (manualId) {
+    return manualId;
+  }
+
+  const appIdCached = readCache(APPID_CACHE, normalizedName.toLowerCase());
+  if (appIdCached !== null) {
+    return appIdCached;
+  }
+
+  const searchResult = await steamFetch(
+    `/storesearch/?term=${encodeURIComponent(normalizedName)}&l=en&cc=us`
+  );
+
+  if (!searchResult || !Array.isArray(searchResult.items) || searchResult.items.length === 0) {
+    writeCache(APPID_CACHE, normalizedName.toLowerCase(), null, APPID_NEGATIVE_CACHE_TTL_MS);
+    return null;
+  }
+
+  const appId = Number(searchResult.items[0].id);
+  if (!appId) {
+    writeCache(APPID_CACHE, normalizedName.toLowerCase(), null, APPID_NEGATIVE_CACHE_TTL_MS);
+    return null;
+  }
+
+  writeCache(APPID_CACHE, normalizedName.toLowerCase(), appId, APPID_CACHE_TTL_MS);
+  return appId;
 }
 
 async function fetchAppDetails(appid) {
+  const numericAppId = Number(appid);
+  if (!numericAppId) {
+    return null;
+  }
+
+  const detailsCached = readCache(APP_DETAILS_CACHE, numericAppId);
+  if (detailsCached !== null) {
+    return detailsCached;
+  }
+
   const details = await steamFetch(`/appdetails/?appids=${appid}&l=en&cc=us`);
   const payload = details?.[appid];
 
   if (!payload || !payload.success || !payload.data) {
+    writeCache(APP_DETAILS_CACHE, numericAppId, null, APP_DETAILS_NEGATIVE_CACHE_TTL_MS);
     return null;
   }
 
-  return normalizeSteamDetails(appid, payload.data);
+  const normalized = normalizeSteamDetails(appid, payload.data);
+  writeCache(APP_DETAILS_CACHE, numericAppId, normalized, APP_DETAILS_CACHE_TTL_MS);
+  return normalized;
 }
 
 async function enrichProductsWithSteam(products) {
